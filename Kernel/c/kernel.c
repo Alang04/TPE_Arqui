@@ -18,6 +18,14 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
 
+// Incluimos el archivo que tiene la definición de la estructura
+#include <videoDriver.h> 
+
+int main() {
+    // Dibujamos un píxel blanco en la coordenada (100, 100)
+    putPixel(100, 100, 0xFFFFFF); // 0xFFFFFF es el color blanco
+    return 0;
+}
 
 void clearBSS(void * bssAddress, uint64_t bssSize)
 {
@@ -78,27 +86,4 @@ void * initializeKernelBinary()
 	ncNewline();
 	ncNewline();
 	return getStackBase();
-}
-
-int main()
-{	
-	ncPrint("[Kernel Main]");
-	ncNewline();
-	ncPrint("  Sample code module at 0x");
-	ncPrintHex((uint64_t)sampleCodeModuleAddress);
-	ncNewline();
-	ncPrint("  Calling the sample code module returned: ");
-	ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	ncNewline();
-	ncNewline();
-
-	ncPrint("  Sample data module at 0x");
-	ncPrintHex((uint64_t)sampleDataModuleAddress);
-	ncNewline();
-	ncPrint("  Sample data module contents: ");
-	ncPrint((char*)sampleDataModuleAddress);
-	ncNewline();
-
-	ncPrint("[Finished]");
-	return 0;
 }
