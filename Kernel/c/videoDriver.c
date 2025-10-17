@@ -1,4 +1,8 @@
 #include "../include/videoDriver.h"
+#include "../include/font.h"
+
+#define FONT_WIDTH 8
+#define FONT_HEIGHT 16
 
 struct vbe_mode_info_structure{
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -49,7 +53,34 @@ void putPixel(int x, int y, int color) {
     int offset = (x + y * VBE_mode_info->width) * (VBE_mode_info->bpp / 8);
 
     // Escribimos los componentes del color (Azul, Verde, Rojo)
-    screen[offset] = color & 0xFF;         // Blue
-    screen[offset + 1] = (color >> 8) & 0xFF;  // Green
-    screen[offset + 2] = (color >> 16) & 0xFF; // Red
+    screen[offset] = color & 0xFF;         		// Blue
+    screen[offset + 1] = (color >> 8) & 0xFF;  	// Green
+    screen[offset + 2] = (color >> 16) & 0xFF; 	// Red
+}
+
+// Nuevas variables para manejar la posición del cursor
+static int currentX = 0;
+static int currentY = 0;
+
+void drawChar(int x, int y, char character, int fontColor, int bgColor) {
+    const uint8_t * selected_char = font_map[(uint8_t)character];
+    for (int i = 0; i < FONT_HEIGHT; i++) {
+        for (int j = 0; j < FONT_WIDTH; j++) {
+            if ((selected_char[i] >> (FONT_WIDTH - 1 - j)) & 1)
+                putPixel(x + j, y + i, fontColor);
+            else
+                putPixel(x + j, y + i, bgColor);
+        }
+    }
+}
+
+void printString(const char * str) {
+    int fontColor = 0xFFFFFF; 	// Blanco
+    int bgColor = 0x000000;   	// Negro
+
+    while (*str){
+        drawChar(currentX, currentY, *str, fontColor, bgColor);
+        currentX += FONT_WIDTH;
+        str++;
+    }
 }
