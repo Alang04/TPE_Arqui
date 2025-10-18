@@ -1,9 +1,11 @@
-#include <stdint.h>
-#include <string.h>
-#include <lib.h>
-#include <moduleLoader.h>
-#include <naiveConsole.h>
-#include <videoDriver.h> 
+// Kernel/c/kernel.c
+#include "../include/stdint.h"
+#include "../include/string.h"
+#include "../include/lib.h"
+#include "../include/moduleLoader.h"
+#include "../include/naiveConsole.h"
+#include "../include/videoDriver.h"
+#include "../include/idt.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -18,74 +20,49 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
 
-int main(){
-    printString("HEllo world\n");
+int main() {
+    // 1. Mensaje de bienvenida
+    printString("Kernel listo. Cargando IDT...\n");
+    
+    // 2. Cargar la IDT (la "central telefónica")
+    load_idt();
 
-    // 1. Habilitamos las interrupciones
-    _sti();
+    // 3. Habilitar interrupciones (abrir la central)
+    printString("Habilitando interrupciones (STI)...\n");
+    _sti(); 
 
+    // 4. Saltar a User Space
+    EntryPoint userlandMain = (EntryPoint)0x400000;
+    printString("Saltando a User Space (0x400000)...\n\n");
+    userlandMain();
+    
+    // Si User Space termina, quedamos aquí
+    printString("\nFin de la ejecucion.");
     while(1);
-
+    
     return 0;
 }
 
-void clearBSS(void * bssAddress, uint64_t bssSize)
-{
+void clearBSS(void * bssAddress, uint64_t bssSize){
 	memset(bssAddress, 0, bssSize);
 }
 
-void * getStackBase()
-{
+void * getStackBase(){
 	return (void*)(
 		(uint64_t)&endOfKernel
-		+ PageSize * 8				//The size of the stack itself, 32KiB
-		- sizeof(uint64_t)			//Begin at the top of the stack
+		+ PageSize * 8			//The size of the stack itself, 32KiB
+		- sizeof(uint64_t)		//Begin at the top of the stack
 	);
 }
 
-void * initializeKernelBinary()
-{
-	char buffer[10];
-
-	ncPrint("[x64BareBones]");
-	ncNewline();
-
-	ncPrint("CPU Vendor:");
-	ncPrint(cpuVendor(buffer));
-	ncNewline();
-
-	ncPrint("[Loading modules]");
-	ncNewline();
-	void * moduleAddresses[] = {
+void * initializeKernelBinary(){
+	
+	void * moduleAddresses[] ={
 		sampleCodeModuleAddress,
 		sampleDataModuleAddress
 	};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
-
-	ncPrint("[Initializing kernel's binary]");
-	ncNewline();
-
 	clearBSS(&bss, &endOfKernel - &bss);
-
-	ncPrint("  text: 0x");
-	ncPrintHex((uint64_t)&text);
-	ncNewline();
-	ncPrint("  rodata: 0x");
-	ncPrintHex((uint64_t)&rodata);
-	ncNewline();
-	ncPrint("  data: 0x");
-	ncPrintHex((uint64_t)&data);
-	ncNewline();
-	ncPrint("  bss: 0x");
-	ncPrintHex((uint64_t)&bss);
-	ncNewline();
-
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
 	return getStackBase();
 }
