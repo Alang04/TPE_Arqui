@@ -19,8 +19,13 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 typedef int (*EntryPoint)();
 
 int main(){
-    printString("Hello, Kernel World!");
-    putPixel(100, 100, 0xFFFFFF); // 0xFFFFFF es el color blanco
+    printString("HEllo world\n");
+
+    // 1. Habilitamos las interrupciones
+    _sti();
+
+    while(1);
+
     return 0;
 }
 

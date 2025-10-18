@@ -4,6 +4,9 @@
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 16
 
+typedef struct vbe_mode_info_structure * VBEInfoPtr;
+VBEInfoPtr VBE_mode_info = (VBEInfoPtr) 0x0000000000005C00;
+
 struct vbe_mode_info_structure{
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
 	uint8_t window_a;			// deprecated
@@ -42,9 +45,31 @@ struct vbe_mode_info_structure{
 	uint8_t reserved1[206];
 } __attribute__ ((packed));
 
-typedef struct vbe_mode_info_structure * VBEInfoPtr;
+/* Variables para manjear la posición del cursor */
+static int currentX = 0;
+static int currentY = 0;
+static const int fontColor = 0xFFFFFF; // Blanco
+static const int bgColor = 0x000000;   // Negro
 
-VBEInfoPtr VBE_mode_info = (VBEInfoPtr) 0x0000000000005C00;
+// Dibuja un caracter en una POSICIÓN ABSOLUTA (la usamos internamente)
+void drawChar(int x, int y, char character) {
+    const uint8_t * selected_char = font_map[(uint8_t)character];
+    for (int i = 0; i < FONT_HEIGHT; i++) {
+        for (int j = 0; j < FONT_WIDTH; j++) {
+            if ((selected_char[i] >> (FONT_WIDTH - 1 - j)) & 1)
+                putPixel(x + j, y + i, fontColor);
+            else
+                putPixel(x + j, y + i, bgColor);
+        }
+    }
+}
+
+// Mueve el cursor a la siguiente línea
+void newLine(){
+    currentX = 0;
+    currentY += FONT_HEIGHT;
+}
+
 
 // Función para dibujar un píxel
 void putPixel(int x, int y, int color) {
@@ -62,25 +87,31 @@ void putPixel(int x, int y, int color) {
 static int currentX = 0;
 static int currentY = 0;
 
-void drawChar(int x, int y, char character, int fontColor, int bgColor) {
-    const uint8_t * selected_char = font_map[(uint8_t)character];
-    for (int i = 0; i < FONT_HEIGHT; i++) {
-        for (int j = 0; j < FONT_WIDTH; j++) {
-            if ((selected_char[i] >> (FONT_WIDTH - 1 - j)) & 1)
-                putPixel(x + j, y + i, fontColor);
-            else
-                putPixel(x + j, y + i, bgColor);
+// Imprime un caracter donde está el CURSOR y lo AVANZA
+void printChar(char c) {
+    if (c == '\n') { // Salto de línea
+        newLine();
+    } else if (c == '\b') { // Backspace (borrar)
+        if (currentX > 0) {
+            currentX -= FONT_WIDTH;
+            drawChar(currentX, currentY, ' '); // Dibuja un espacio en blanco para "borrar"
+        }
+    } else {
+        // Dibuja el caracter en la posición actual
+        drawChar(currentX, currentY, c);
+        // Avanza el cursor
+        currentX += FONT_WIDTH;
+
+        // Si nos pasamos del borde, saltamos de línea
+        if (currentX + FONT_WIDTH > VBE_mode_info -> width) {
+            newLine();
         }
     }
 }
 
 void printString(const char * str) {
-    int fontColor = 0xFFFFFF; 	// Blanco
-    int bgColor = 0x000000;   	// Negro
-
-    while (*str){
-        drawChar(currentX, currentY, *str, fontColor, bgColor);
-        currentX += FONT_WIDTH;
+    while (*str) {
+        printChar(*str);
         str++;
     }
 }
