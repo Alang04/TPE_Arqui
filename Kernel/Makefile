@@ -4,7 +4,7 @@ AS := nasm
 ASFLAGS := -felf64
 
 CC := x86_64-linux-gnu-gcc
-CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -fno-builtin -fno-stack-protector -mno-red-zone -Iinclude -nostdlib 
+CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -fno-builtin -fno-stack-protector -mno-red-zone -Iinclude -nostdlib -U_FORTIFY_SOURCE
 
 LD := x86_64-linux-gnu-ld
 LDFLAGS := --warn-common -z max-page-size=0x1000 -T kernel.ld
