@@ -1,19 +1,59 @@
-/* sampleCodeModule.c */
+#include <stdint.h>
 
-char * v = (char*)0xB8000 + 79 * 2;
+static uint64_t _int80(uint64_t rax, uint64_t rbx, uint64_t rcx, uint64_t rdx) {
+    uint64_t ret;
+    __asm__ __volatile__(
+        "int $0x80"
+        : "=a" (ret)
+        : "a" (rax), "b" (rbx), "c" (rcx), "d" (rdx)
+        : "memory"
+    );
+    return ret;
+}
 
-static int var1 = 0;
-static int var2 = 0;
+#define SYSCALL_WRITE 1
+#define SYSCALL_READ  0
+#define STDOUT 1
+#define STDIN  0
 
+static int strlen(const char * str) {
+    int i = 0;
+    while (str[i]) i++;
+    return i;
+}
+
+void printf(const char * str) {
+    _int80(SYSCALL_WRITE, STDOUT, (uint64_t)str, strlen(str));
+}
+
+char read() {
+    char c = 0;
+    // Hacemos polling (preguntamos en bucle) hasta que la syscall
+    // nos devuelva un caracter que no sea 0
+    while(c == 0) {
+        c = _int80(SYSCALL_READ, STDIN, 0, 0);
+    }
+    return c;
+}
 
 int main() {
-	//All the following code may be removed 
-	*v = 'X';
-	*(v+1) = 0x74;
+    
+    printf("Hola desde User space\n");
 
-	//Test if BSS is properly set up
-	if (var1 == 0 && var2 == 0)
-		return 0xDEADC0DE;
+    char c;
+    char buffer[2] = {0}; // Un buffer para imprimir "c" como un string
 
-	return 0xDEADBEEF;
+    while(1) {
+        // 1. Pedimos una tecla al Kernel
+        c = read();
+        
+        // 2. Convertimos la tecla a un string
+        buffer[0] = c;
+        buffer[1] = 0;
+        
+        // 3. Le pedimos al Kernel que la imprima
+        printf(buffer);
+    }
+    
+    return 0;
 }

@@ -9,7 +9,7 @@ CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -fno-builtin -fno-stack-pr
 LD := x86_64-linux-gnu-ld
 LDFLAGS := --warn-common -z max-page-size=0x1000 -T kernel.ld
 
-ASM_SRCS := loader.asm asm/libasm.asm
+ASM_SRCS := loader.asm asm/libasm.asm asm/interrupts.asm
 ASM_OBJS := $(ASM_SRCS:.asm=.o)
 
 C_SRCS := $(wildcard c/*.c)
@@ -29,6 +29,9 @@ loader.o: loader.asm
 
 asm/libasm.o: asm/libasm.asm
 	$(AS) $(ASFLAGS) asm/libasm.asm -o asm/libasm.o
+
+asm/interrupts.o: asm/interrupts.asm
+	$(AS) $(ASFLAGS) asm/interrupts.asm -o asm/interrupts.o
 
 # compile C sources
 c/%.o: c/%.c
