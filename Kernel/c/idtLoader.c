@@ -32,6 +32,18 @@ typedef struct {
 
 static IDTR idtr = { sizeof(idt) - 1, (uint64_t)idt };
 
+static inline uint8_t inb_local(uint16_t port) {
+	uint8_t value;
+	__asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
+	return value;
+}
+
+static inline void outb_local(uint16_t port, uint8_t value) {
+	__asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
+}
+
+static void remapPIC(void);
+
 extern void _irq00Handler(void);
 extern void _irq01Handler(void);
 extern void _irq02Handler(void);
@@ -75,6 +87,8 @@ void load_idt(void) {
 	__asm__ volatile ("lidt %0" : : "m"(idtr));
 	printString("IDT cargada.\n");
 
+	remapPIC();
+
 	// Enable timer tick and keyboard interruptions
 	picMasterMask(0b11111100); 
 	picSlaveMask(0b11111111);
@@ -88,4 +102,23 @@ static void setup_IDT_entry (int index, uint64_t offset, uint8_t access) {
 	idt[index].offset_m = (offset >> 16) & 0xFFFF;
 	idt[index].offset_h = (offset >> 32) & 0xFFFFFFFF;
 	idt[index].other_cero = (uint64_t) 0;
+}
+
+static void remapPIC(void) {
+	const uint8_t PIC_MASTER_OFFSET = 0x20;
+	const uint8_t PIC_SLAVE_OFFSET = 0x28;
+	uint8_t masterMask = inb_local(0x21);
+	uint8_t slaveMask = inb_local(0xA1);
+
+	outb_local(0x20, 0x10 | 0x01);
+	outb_local(0xA0, 0x10 | 0x01);
+	outb_local(0x21, PIC_MASTER_OFFSET);
+	outb_local(0xA1, PIC_SLAVE_OFFSET);
+	outb_local(0x21, 0x04);
+	outb_local(0xA1, 0x02);
+	outb_local(0x21, 0x01);
+	outb_local(0xA1, 0x01);
+
+	outb_local(0x21, masterMask);
+	outb_local(0xA1, slaveMask);
 }
