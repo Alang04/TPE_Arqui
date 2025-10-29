@@ -60,9 +60,9 @@ static const int bgColor = 0x000000;   // Negro
 
 
 // Dibuja un caracter en una POSICIÓN ABSOLUTA
-void drawChar(int x, int y, char character) {
-    const uint8_t * selected_char = font_map[(uint8_t)character];
-    for (int i = 0; i < FONT_HEIGHT; i++) {
+void drawChar(int x, int y, char character){
+    const uint8_t * selected_char = font[(uint8_t)character];
+    for(int i = 0; i < FONT_HEIGHT; i++){
         for (int j = 0; j < FONT_WIDTH; j++) {
             if ((selected_char[i] >> (FONT_WIDTH - 1 - j)) & 1)
                 putPixel(x + j, y + i, fontColor);

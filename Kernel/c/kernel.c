@@ -1,4 +1,3 @@
-// Kernel/c/kernel.c
 #include <stdint.h>
 #include <string.h>
 #include <lib.h>

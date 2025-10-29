@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void exceptionDispatcher(uint64_t exception, uint64_t error_code);
+void exceptionDispatcher(int exception);
 
 #endif
