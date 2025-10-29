@@ -1,18 +1,19 @@
 #include <exceptions.h>
 #include <videoDriver.h> // Para imprimir el error
 
-// Imprime un mensaje y se congela
-void exceptionDispatcher(uint64_t exception, uint64_t error_code) {
+#define ZERO_EXCEPTION_ID 0
+
+static void zero_division();
+
+void exceptionDispatcher(int exception){
     printString("EXCEPCION RECIBIDA");
-    newLine();
     
-    if (exception == 0x00) {
-        printString("ERROR: Division por cero");
-    } else if (exception == 0x06) {
-        printString("ERROR: Opcode Invalido");
-    } else {
-        printString("Excepcion");
+    if(exception == ZERO_EXCEPTION_ID){
+        zero_division();
     }
-    
-    while(1);
+}
+
+static void zero_division(){
+	_sti();
+	exceptionMsg("Cannot Divide By Zero!");
 }

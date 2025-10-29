@@ -100,7 +100,7 @@ picMasterMask:
 picSlaveMask:
 	push    rbp
     mov     rbp, rsp
-    mov     ax, di  ; ax = mascara de 16 bits
+    mov     ax, di 
     out	    0A1h,al
     pop     rbp
     retn

@@ -5,7 +5,8 @@
 #include <moduleLoader.h>
 #include <naiveConsole.h>
 #include <videoDriver.h>
-#include <idt.h>
+#include <idtLoader.h>
+#include <timer.h>
 
 extern uint8_t text;
 extern uint8_t rodata;

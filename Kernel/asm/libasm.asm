@@ -1,4 +1,6 @@
 GLOBAL cpuVendor
+GLOBAL getTime
+GLOBAL getPressedKey
 
 section .text
 	
@@ -10,7 +12,6 @@ cpuVendor:
 
 	mov rax, 0
 	cpuid
-
 
 	mov [rdi], ebx
 	mov [rdi + 4], edx
@@ -26,27 +27,66 @@ cpuVendor:
 	pop rbp
 	ret
 
-GLOBAL inb
-inb:
-    push rbp
-    mov rbp, rsp
-    mov rax, 0
-    mov rdx, rdi  ; RDI tiene el número de puerto (ej: 0x60)
-    in al, dx     ; Leer 1 byte del puerto en AL
-    pop rbp
-    ret
+getTime:
+	; recibe en rdi el puntero al buffer de respuesta
+	push rbp
+	mov rbp, rsp 
 
-GLOBAL outb
-outb:
-    push rbp
-    mov rbp, rsp
-    mov rdx, rdi  ; RDI tiene el número de puerto (ej: 0x20)
-    mov rax, rsi  ; RSI tiene el valor a escribir
-    out dx, al    ; Escribir 1 byte en el puerto
-    pop rbp
-    ret
+	call getHour
+	mov [rdi], al
 
-GLOBAL _sti
-_sti:
-    sti
-    ret
+	call getMinutes
+	mov [rdi+1], al
+
+	call getSeconds
+	mov [rdi+2], al 
+
+	leave
+	ret
+
+getSeconds:
+	mov al, 0
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getMinutes:
+	mov al, 2
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getHour:
+	mov al, 4
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getDayOfWeek:
+	mov al, 6
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getMonth:
+	mov al, 8
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getYear:
+	mov al, 9
+	out 0x70, al
+	in al, 0x71
+	ret
+
+getPressedKey:
+	xor rax, rax 
+.loop:
+	in al, 64h
+	and al, 0x01
+	jz .loop ; si no tiene tecla se queda esperando
+    
+	; ahora tiene tecla
+	in al, 60h
+	ret

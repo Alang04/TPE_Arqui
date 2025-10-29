@@ -1,21 +1,18 @@
-#include <irqDispatcher.h>
-#include <keyboardDriver.h>
-#include <lib.h>
+#include <stdint.h>
 #include <timer.h>
 
-#define KEYBOARD_IRQ 1
-#define TIMER_IRQ 0
+static void int_20();
 
 void irqDispatcher(uint64_t irq){
-    switch (irq){
-        case TIMER_IRQ:            
-            timer_handler();
-            break;
-        case KEYBOARD_IRQ:
-            keyboard_handler();
-            break;
-    }
+	switch(irq){
+		case 0:
+			int_20();
+			break;
+	}
 
-    // Enviamos "End of Interrupt" (EOI) al PIC para avisar que terminamos.
-    outb(0x20, 0x20);
+	return;
+}
+
+void int_20(){
+	timer_handler();
 }
