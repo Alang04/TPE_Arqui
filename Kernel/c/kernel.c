@@ -24,12 +24,13 @@ int main(){
     printString("Kernel listo. Cargando IDT...\n");
     load_idt();
 
-    printString("Habilitando interrupciones (STI)...\n");
-    _sti(); 
+	printString("Habilitando interrupciones (STI)...\n");
+	_sti();
+	printString("STI ejecutado.\n");
 
-    EntryPoint userlandMain = (EntryPoint)0x400000;
-    printString("Saltando a User Space (0x400000)...\n\n");
-    userlandMain();
+	EntryPoint userlandMain = (EntryPoint)0x400000;
+	printString("Saltando a User Space (0x400000)...\n\n");
+	userlandMain();
     
     printString("\nFin de la ejecucion.");
     while(1);

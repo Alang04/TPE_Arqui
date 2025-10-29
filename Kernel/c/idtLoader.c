@@ -2,6 +2,8 @@
 #include <idtLoader.h>
 #include <interrupts.h>
 #include <defs.h>
+#include <lib.h>
+#include <videoDriver.h>
 
 #pragma pack(push)		/* Push de la alineación actual */
 #pragma pack (1) 		/* Alinear las siguiente estructuras a 1 byte */
@@ -19,7 +21,16 @@ typedef struct {
 
 #pragma pack(pop)		/* Reestablece la alinceación actual */
 
-DESCR_INT * idt = (DESCR_INT *) 0;	// IDT de 255 entradas
+#define IDT_ENTRIES 256
+
+static DESCR_INT idt[IDT_ENTRIES] __attribute__((aligned(0x10)));
+
+typedef struct {
+	uint16_t limit;
+	uint64_t base;
+} __attribute__((packed)) IDTR;
+
+static IDTR idtr = { sizeof(idt) - 1, (uint64_t)idt };
 
 extern void _irq00Handler(void);
 extern void _irq01Handler(void);
@@ -35,6 +46,18 @@ static void setup_IDT_entry (int index, uint64_t offset, uint8_t access);
 void load_idt(void) {
 	_cli();
 
+	IDTR currentIdtr;
+	__asm__ volatile ("sidt %0" : "=m"(currentIdtr));
+
+	uint32_t bytesToCopy = currentIdtr.limit + 1;
+	if (bytesToCopy > sizeof(idt)) {
+		bytesToCopy = sizeof(idt);
+	}
+	memcpy(idt, (void*)currentIdtr.base, bytesToCopy);
+	if (bytesToCopy < sizeof(idt)) {
+		memset((uint8_t*)idt + bytesToCopy, 0, sizeof(idt) - bytesToCopy);
+	}
+
 	// Setup exception interrupts
 	setup_IDT_entry(0x00, (uint64_t)&_exception0Handler, ACS_INT);
 
@@ -49,11 +72,12 @@ void load_idt(void) {
     // Setup syscall interrupt
 	setup_IDT_entry(0x80, (uint64_t)&syscallIntRoutine, ACS_INT | ACS_DPL_3);
 	
+	__asm__ volatile ("lidt %0" : : "m"(idtr));
+	printString("IDT cargada.\n");
+
 	// Enable timer tick and keyboard interruptions
 	picMasterMask(0b11111100); 
 	picSlaveMask(0b11111111);
-	
-	_sti();
 }
 
 static void setup_IDT_entry (int index, uint64_t offset, uint8_t access) {
