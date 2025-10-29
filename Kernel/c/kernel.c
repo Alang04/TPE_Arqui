@@ -20,23 +20,17 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
 
-int main() {
-    // 1. Mensaje de bienvenida
+int main(){
     printString("Kernel listo. Cargando IDT...\n");
-    
-    // 2. Cargar la IDT (la "central telefónica")
     load_idt();
 
-    // 3. Habilitar interrupciones (abrir la central)
     printString("Habilitando interrupciones (STI)...\n");
     _sti(); 
 
-    // 4. Saltar a User Space
     EntryPoint userlandMain = (EntryPoint)0x400000;
     printString("Saltando a User Space (0x400000)...\n\n");
     userlandMain();
     
-    // Si User Space termina, quedamos aquí
     printString("\nFin de la ejecucion.");
     while(1);
     

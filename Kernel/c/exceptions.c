@@ -1,5 +1,5 @@
 #include <exceptions.h>
-#include <videoDriver.h> // Para imprimir el error
+#include <videoDriver.h>
 
 #define ZERO_EXCEPTION_ID 0
 
@@ -15,5 +15,5 @@ void exceptionDispatcher(int exception){
 
 static void zero_division(){
 	_sti();
-	exceptionMsg("Cannot Divide By Zero!");
+	printString("Cannot Divide By Zero!");
 }

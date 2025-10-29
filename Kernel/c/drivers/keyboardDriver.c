@@ -19,3 +19,14 @@ void printPressedKey() {
         }   
     }
 }
+
+// Syscall-friendly keyboard read: returns the ASCII character
+// corresponding to the next pressed key (0 if none).
+uint64_t sys_read_keyboard() {
+    char c = 0;
+    char sc = getPressedKey(); // blocks until a scancode is available
+    if ((unsigned char)sc < 128) {
+        c = scancode_to_ascii[(unsigned char)sc];
+    }
+    return (uint64_t)c;
+}

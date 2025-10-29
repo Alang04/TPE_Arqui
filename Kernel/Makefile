@@ -12,7 +12,7 @@ LDFLAGS := --warn-common -z max-page-size=0x1000 -T kernel.ld
 ASM_SRCS := loader.asm asm/libasm.asm asm/interrupts.asm
 ASM_OBJS := $(ASM_SRCS:.asm=.o)
 
-C_SRCS := $(wildcard c/*.c)
+C_SRCS := $(shell find c -name '*.c')
 C_OBJS := $(C_SRCS:.c=.o)
 
 OBJS := $(ASM_OBJS) $(C_OBJS)

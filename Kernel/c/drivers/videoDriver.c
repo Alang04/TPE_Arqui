@@ -55,13 +55,10 @@ static int currentY = 0;
 static const int fontColor = 0xFFFFFF; // Blanco
 static const int bgColor = 0x000000;   // Negro
 
-#define FONT_WIDTH 8
-#define FONT_HEIGHT 16
-
 
 // Dibuja un caracter en una POSICIÓN ABSOLUTA
 void drawChar(int x, int y, char character){
-    const uint8_t * selected_char = font[(uint8_t)character];
+    const unsigned char * selected_char = font[(uint8_t)character];
     for(int i = 0; i < FONT_HEIGHT; i++){
         for (int j = 0; j < FONT_WIDTH; j++) {
             if ((selected_char[i] >> (FONT_WIDTH - 1 - j)) & 1)
@@ -109,7 +106,7 @@ void printChar(char c) {
 }
 
 // Imprime un string usando el cursor
-void printString(const char * str) {
+void printString(const char * str){
     while (*str) {
         printChar(*str);
         str++;
