@@ -1,5 +1,5 @@
-#include "../include/videoDriver.h"
-#include "../include/font.h"
+#include <videoDriver.h>
+#include <font.h>
 #include <stdint.h>
 
 typedef struct vbe_mode_info_structure {

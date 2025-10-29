@@ -1,4 +1,4 @@
-#include "../include/font.h"
+#include <font.h>
 #include <stdint.h>
 
 const uint8_t font_map[256][16] ={

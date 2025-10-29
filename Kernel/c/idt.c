@@ -1,6 +1,6 @@
-#include "../include/idt.h"
+#include <idt.h>
 #include <stdint.h>
-#include "../include/lib.h" // Para memset
+#include <lib.h> // Para memset
 
 // --- Declaramos los "enchufes" de ensamblador con los NOMBRES CORRECTOS ---
 extern void _irq0Handler();    // <-- Corregido

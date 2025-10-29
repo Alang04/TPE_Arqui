@@ -1,8 +1,7 @@
-// Kernel/c/irqDispatcher.c
-#include "../include/irqDispatcher.h"
-#include "../include/keyboardDriver.h"
-#include "../include/lib.h"             
-#include "../include/timer.h"
+#include <irqDispatcher.h>
+#include <keyboardDriver.h>
+#include <lib.h>
+#include <timer.h>
 
 #define KEYBOARD_IRQ 1
 #define TIMER_IRQ 0

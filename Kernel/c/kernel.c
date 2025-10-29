@@ -1,11 +1,11 @@
 // Kernel/c/kernel.c
-#include "../include/stdint.h"
-#include "../include/string.h"
-#include "../include/lib.h"
-#include "../include/moduleLoader.h"
-#include "../include/naiveConsole.h"
-#include "../include/videoDriver.h"
-#include "../include/idt.h"
+#include <stdint.h>
+#include <string.h>
+#include <lib.h>
+#include <moduleLoader.h>
+#include <naiveConsole.h>
+#include <videoDriver.h>
+#include <idt.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
