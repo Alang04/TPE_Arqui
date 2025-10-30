@@ -23,8 +23,8 @@ static void printHex64(uint64_t value);
 typedef int (*EntryPoint)();
 
 int main(){
-    printString("Kernel listo. Cargando IDT...\n");
-    load_idt();
+    	printString("Kernel listo. Cargando IDT...\n");
+    	load_idt();
 
 	printString("Module[0] qword: ");
 	printHex64(*(uint64_t*)sampleCodeModuleAddress);

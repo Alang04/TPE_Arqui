@@ -1,6 +1,7 @@
-#include "keyboardDriver.h"
-#include "lib.h"
-#include "naiveConsole.h"
+#include <keyboardDriver.h>
+#include <lib.h>
+#include <naiveConsole.h>
+#include <videoDriver.h>
 
 char scancode_to_ascii[128] = {
     0,  27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b', // backspace
@@ -11,22 +12,24 @@ char scancode_to_ascii[128] = {
     // ... (resto omitido)
 };
 
-void printPressedKey() {
-    while (1) {
+void printPressedKey(){
+    while(1){
         uint8_t scancode = getPressedKey();
-        if (scancode < 128) {
+        if(scancode < 128){
             ncPrintChar(scancode_to_ascii[scancode]);
-        }   
+            printString("Presionaste una tecla\n");
+        }
     }
 }
 
 // Syscall-friendly keyboard read: returns the ASCII character
 // corresponding to the next pressed key (0 if none).
-uint64_t sys_read_keyboard() {
+uint64_t sys_read_keyboard(){
     char c = 0;
     char sc = getPressedKey(); // blocks until a scancode is available
-    if ((unsigned char)sc < 128) {
+    if((unsigned char)sc < 128){
         c = scancode_to_ascii[(unsigned char)sc];
+        printString("Entre a sys_read_keyboard\n");
     }
     return (uint64_t)c;
 }
