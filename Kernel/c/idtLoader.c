@@ -53,6 +53,7 @@ extern void _irq04Handler(void);
 extern void _irq05Handler(void);
 extern void _exception0Handler(void);
 extern void syscallIntRoutine(void);
+extern uint64_t getSyscallIntRoutineAddr(void);
 
 static void setup_IDT_entry (int index, uint64_t offset, uint8_t access);
 
@@ -82,10 +83,12 @@ void load_idt(void) {
 	setup_IDT_entry(0x24, (uint64_t)&_irq04Handler, ACS_INT);
 	setup_IDT_entry(0x25, (uint64_t)&_irq05Handler, ACS_INT);
     
+	uint64_t syscallHandlerAddr = getSyscallIntRoutineAddr();
+
 	// Setup syscall interrupt
-	setup_IDT_entry(0x80, (uint64_t)&syscallIntRoutine, ACS_INT | ACS_DPL_3);
+	setup_IDT_entry(0x80, syscallHandlerAddr, ACS_INT | ACS_DPL_3);
 	printString("IDT[0x80] handler: ");
-	printHex64_local((uint64_t)&syscallIntRoutine);
+	printHex64_local(syscallHandlerAddr);
 	printString("\n");
 	
 	__asm__ volatile ("lidt %0" : : "m"(idtr));

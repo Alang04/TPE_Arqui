@@ -33,21 +33,18 @@ int main(){
 	printString((const char*)0x401000);
 	printString("\n");
 
-	printString("Saltando habilitacion de interrupciones para debug...\n");
-	printString("(CLI mantiene IRQs deshabilitadas, int 0x80 sigue disponible.)\n");
+	printString("Habilitando interrupciones (STI)...\n");
+	_sti();
+	printString("STI ejecutado.\n");
 
-	EntryPoint userlandMain = (EntryPoint)0x400000;
+	EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
 	printString("Saltando a User Space (0x400000)...\n\n");
 	userlandMain();
-
-	printString("\nUserland retorno al kernel. Flag 0x600000 = ");
-	printHex64(*(uint64_t *)0x600000);
-	printString("\n");
     
-    printString("\nFin de la ejecucion.");
-    while(1);
+    	printString("\nFin de la ejecucion.");
+    	while(1);
     
-    return 0;
+    	return 0;
 }
 
 void clearBSS(void * bssAddress, uint64_t bssSize){

@@ -26,25 +26,34 @@ void printf(const char * str) {
     _int80(SYSCALL_WRITE, STDOUT, (uint64_t)str, strlen(str));
 }
 
+static void putchar(char c) {
+    _int80(SYSCALL_WRITE, STDOUT, (uint64_t)&c, 1);
+}
+
 char read() {
     char c = 0;
-    // Hacemos polling (preguntamos en bucle) hasta que la syscall
-    // nos devuelva un caracter que no sea 0
-    while(c == 0) {
-    volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
-    *sharedFlag = 0x1BADB002;
+    while (c == 0) {
         c = _int80(SYSCALL_READ, STDIN, 0, 0);
     }
     return c;
 }
 
 int main() {
-    volatile char *video = (char *)0xB8000;
-    video[0] = 'U';
-    video[1] = 0x0F;
+    printf("Bienvenido a userland!\n");
+    printf("Presione teclas (q para salir).\n");
 
-    volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
-    *sharedFlag = 0xFEEDBEEFCAFEBEEFULL;
+    while (1){
+        char c = read();
 
-    return 0; // Temporarily return to kernel for debugging
+        if(c == 'q' || c == 'Q'){
+            printf("Saliendo de userland...\n");
+            break;
+        }
+
+        printf("Tecla presionada: ");
+        putchar(c);
+        printf("\n");
+    }
+
+    return 0;
 }

@@ -11,9 +11,6 @@ int _start() {
 	//Clean BSS
 	memset(&bss, 0, &endOfBinary - &bss);
 
-	volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
-	*sharedFlag = 0x2BADB002;
-
 	return main();
 
 }

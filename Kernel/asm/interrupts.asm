@@ -12,6 +12,7 @@ GLOBAL _irq04Handler
 GLOBAL _irq05Handler
 GLOBAL _exception0Handler
 GLOBAL syscallIntRoutine
+GLOBAL getSyscallIntRoutineAddr
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
@@ -146,6 +147,10 @@ syscallIntRoutine:
 	mov [rsp + 14*8], rax
 	popState
 	iretq
+
+getSyscallIntRoutineAddr:
+	lea rax, [rel syscallIntRoutine]
+	ret
 
 haltcpu:
 	cli
