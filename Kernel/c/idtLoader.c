@@ -43,6 +43,7 @@ static inline void outb_local(uint16_t port, uint8_t value) {
 }
 
 static void remapPIC(void);
+static void printHex64_local(uint64_t value);
 
 extern void _irq00Handler(void);
 extern void _irq01Handler(void);
@@ -81,8 +82,11 @@ void load_idt(void) {
 	setup_IDT_entry(0x24, (uint64_t)&_irq04Handler, ACS_INT);
 	setup_IDT_entry(0x25, (uint64_t)&_irq05Handler, ACS_INT);
     
-    // Setup syscall interrupt
+	// Setup syscall interrupt
 	setup_IDT_entry(0x80, (uint64_t)&syscallIntRoutine, ACS_INT | ACS_DPL_3);
+	printString("IDT[0x80] handler: ");
+	printHex64_local((uint64_t)&syscallIntRoutine);
+	printString("\n");
 	
 	__asm__ volatile ("lidt %0" : : "m"(idtr));
 	printString("IDT cargada.\n");
@@ -121,4 +125,16 @@ static void remapPIC(void) {
 
 	outb_local(0x21, masterMask);
 	outb_local(0xA1, slaveMask);
+}
+
+static void printHex64_local(uint64_t value) {
+	char buffer[19];
+	buffer[0] = '0';
+	buffer[1] = 'x';
+	for (int i = 0; i < 16; i++) {
+		uint8_t nibble = (value >> (60 - i * 4)) & 0xF;
+		buffer[2 + i] = (nibble < 10) ? ('0' + nibble) : ('A' + nibble - 10);
+	}
+	buffer[18] = '\0';
+	printString(buffer);
 }

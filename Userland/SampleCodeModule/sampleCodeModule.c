@@ -31,29 +31,20 @@ char read() {
     // Hacemos polling (preguntamos en bucle) hasta que la syscall
     // nos devuelva un caracter que no sea 0
     while(c == 0) {
+    volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
+    *sharedFlag = 0x1BADB002;
         c = _int80(SYSCALL_READ, STDIN, 0, 0);
     }
     return c;
 }
 
 int main() {
-    
-    printf("Hola desde User space\n");
+    volatile char *video = (char *)0xB8000;
+    video[0] = 'U';
+    video[1] = 0x0F;
 
-    char c;
-    char buffer[2] = {0}; // Un buffer para imprimir "c" como un string
+    volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
+    *sharedFlag = 0xFEEDBEEFCAFEBEEFULL;
 
-    while(1) {
-        // 1. Pedimos una tecla al Kernel
-        c = read();
-        
-        // 2. Convertimos la tecla a un string
-        buffer[0] = c;
-        buffer[1] = 0;
-        
-        // 3. Le pedimos al Kernel que la imprima
-        printf(buffer);
-    }
-    
-    return 0;
+    return 0; // Temporarily return to kernel for debugging
 }

@@ -3,7 +3,6 @@
 
 extern char bss;
 extern char endOfBinary;
-
 int main();
 
 void * memset(void * destiny, int32_t c, uint64_t length);
@@ -11,6 +10,9 @@ void * memset(void * destiny, int32_t c, uint64_t length);
 int _start() {
 	//Clean BSS
 	memset(&bss, 0, &endOfBinary - &bss);
+
+	volatile uint64_t *sharedFlag = (uint64_t *)0x600000;
+	*sharedFlag = 0x2BADB002;
 
 	return main();
 
