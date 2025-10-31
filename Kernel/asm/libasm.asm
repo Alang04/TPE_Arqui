@@ -86,7 +86,6 @@ getPressedKey:
 	in al, 64h
 	and al, 0x01
 	jz .loop ; si no tiene tecla se queda esperando
-    
 	; ahora tiene tecla
 	in al, 60h
 	ret

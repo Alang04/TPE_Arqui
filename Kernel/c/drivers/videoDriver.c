@@ -69,6 +69,27 @@ void drawChar(int x, int y, char character){
     }
 }
 
+void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color) {
+    for (uint32_t i = 0; i < height; i++) {
+        for (uint32_t j = 0; j < width; j++) {
+            putPixel(x + j, y + i, color);
+        }
+    }
+}
+
+void drawGlyph8x16(uint32_t x, uint32_t y, char c, uint32_t color){
+    uint8_t uc = (uint8_t)c;
+    const uint8_t *glyph = font[uc]; // Usar la fuente de font.h
+    for (uint32_t row = 0; row < FONT_HEIGHT; row++) {
+        uint8_t bits = glyph[row];
+        for (uint32_t col = 0; col < FONT_WIDTH; col++) {
+            if (bits & (0x80 >> col)) {
+                putPixel(x + col, y + row, color);
+            }
+        }
+    }
+}
+
 // Mueve el cursor a la siguiente línea
 void newLine(){
     currentX = 0;

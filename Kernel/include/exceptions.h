@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void exceptionDispatcher(int exception);
+void exceptionDispatcher(int exception, uint64_t *stackPtr);
 
 #endif

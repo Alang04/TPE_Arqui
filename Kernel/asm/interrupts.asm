@@ -11,6 +11,7 @@ GLOBAL _irq03Handler
 GLOBAL _irq04Handler
 GLOBAL _irq05Handler
 GLOBAL _exception0Handler
+GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
 GLOBAL getSyscallIntRoutineAddr
 
@@ -73,6 +74,7 @@ SECTION .text
 	pushState
 
 	mov rdi, %1
+	mov rsi, rsp ; pasar puntero a registros salvados
 	call exceptionDispatcher
 
 	popState
@@ -136,14 +138,20 @@ _irq05Handler:
 _exception0Handler:
 	exceptionHandler 0
 
+;Invalid Opcode Exception
+_exception6Handler:
+	exceptionHandler 6
+
 syscallIntRoutine:
 	pushState
+	sti
 	mov r8, rdx
 	mov rdi, rax
 	mov rsi, rbx
 	mov rdx, rcx
 	mov rcx, r8
 	call int80Dispatcher
+	cli
 	mov [rsp + 14*8], rax
 	popState
 	iretq

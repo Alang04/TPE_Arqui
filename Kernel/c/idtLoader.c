@@ -52,6 +52,7 @@ extern void _irq03Handler(void);
 extern void _irq04Handler(void);
 extern void _irq05Handler(void);
 extern void _exception0Handler(void);
+extern void _exception6Handler(void);
 extern void syscallIntRoutine(void);
 extern uint64_t getSyscallIntRoutineAddr(void);
 
@@ -74,6 +75,7 @@ void load_idt(void) {
 
 	// Setup exception interrupts
 	setup_IDT_entry(0x00, (uint64_t)&_exception0Handler, ACS_INT);
+	setup_IDT_entry(0x06, (uint64_t)&_exception6Handler, ACS_INT);
 
 	// Setup hardware interrupts
 	setup_IDT_entry(0x20, (uint64_t)&_irq00Handler, ACS_INT);
@@ -96,8 +98,8 @@ void load_idt(void) {
 
 	remapPIC();
 
-	// Enable timer tick and keyboard interruptions
-	picMasterMask(0b11111100); 
+	// Enable timer tick (IRQ0) and keyboard (IRQ1) for IRQ-driven keyboard buffer.
+	picMasterMask(0b11111100);
 	picSlaveMask(0b11111111);
 }
 

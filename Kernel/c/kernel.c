@@ -7,6 +7,7 @@
 #include <idtLoader.h>
 #include <timer.h>
 #include <interrupts.h>
+#include <keyboardDriver.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -39,8 +40,9 @@ int main(){
 
 	EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
 	printString("Saltando a User Space (0x400000)...\n\n");
+
 	userlandMain();
-    
+
     	printString("\nFin de la ejecucion.");
     	while(1);
     
