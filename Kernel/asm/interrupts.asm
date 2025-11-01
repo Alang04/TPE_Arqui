@@ -10,18 +10,21 @@ GLOBAL _irq02Handler
 GLOBAL _irq03Handler
 GLOBAL _irq04Handler
 GLOBAL _irq05Handler
+GLOBAL _irq128Handler
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
 GLOBAL getSyscallIntRoutineAddr
-
 EXTERN irqDispatcher
-EXTERN exceptionDispatcher
 EXTERN int80Dispatcher
+EXTERN exceptionDispatcher
+EXTERN getStackBase
+EXTERN syscalls
 
 SECTION .text
 
 %macro pushState 0
+
 	push rax
 	push rbx
 	push rcx
@@ -40,6 +43,7 @@ SECTION .text
 %endmacro
 
 %macro popState 0
+
 	pop r15
 	pop r14
 	pop r13
@@ -73,11 +77,18 @@ SECTION .text
 %macro exceptionHandler 1
 	pushState
 
-	mov rdi, %1
-	mov rsi, rsp ; pasar puntero a registros salvados
+	; primer parámetro: número de excepción
+	mov rdi, %1 
+
+	; segundo parámetro: puntero al contexto (registros en el stack)
+	mov rsi, rsp
 	call exceptionDispatcher
 
-	popState
+popState
+	call getStackBase	
+
+	mov qword [rsp+8*3], rax				
+	mov qword [rsp], userland	
 	iretq
 %endmacro
 
@@ -96,19 +107,19 @@ _sti:
 
 picMasterMask:
 	push    rbp
-    mov     rbp, rsp
-    mov     ax, di
-    out	    21h,al
-    pop     rbp
-    retn
+   	mov     rbp, rsp
+    	mov     ax, di
+    	out	    21h,al
+    	pop     rbp
+    	retn
 
 picSlaveMask:
 	push    rbp
-    mov     rbp, rsp
-    mov     ax, di 
-    out	    0A1h,al
-    pop     rbp
-    retn
+    	mov     rbp, rsp
+    	mov     ax, di 
+    	out	   0A1h, al
+    	pop     rbp
+    	retn
 
 ;8254 Timer (Timer Tick)
 _irq00Handler:
@@ -116,6 +127,48 @@ _irq00Handler:
 
 ;Keyboard
 _irq01Handler:
+	push rax
+	xor 	rax, rax
+	in 	al, 0x60 ; guardo la tecla
+	mov 	[pressed_key], rax
+	cmp 	rax, SNAPSHOT_KEY
+	jne 	.doNotCapture
+
+	pop 	rax
+	mov 	rax, 15
+	mov 	r8, 10
+	mov 	[reg_array + 0*8],  rax
+	mov 	[reg_array + 1*8],  rbx
+	mov 	[reg_array + 2*8],  rcx
+	mov 	[reg_array + 3*8],  rdx
+	mov 	[reg_array + 4*8],  rbp
+	mov 	[reg_array + 5*8],  rdi
+	mov 	[reg_array + 6*8],  rsi
+	mov 	[reg_array + 7*8],  r8
+	mov 	[reg_array + 8*8],  r9
+	mov 	[reg_array + 9*8], r10
+	mov 	[reg_array + 10*8], r11
+	mov 	[reg_array + 11*8], r12
+	mov 	[reg_array + 12*8], r13
+	mov 	[reg_array + 13*8], r14
+	mov 	[reg_array + 14*8], r15
+	mov 	rax, [rsp+8*0] ; rip
+	mov 	[reg_array + 15*8], rax
+	mov 	rax, [rsp+8*1] ; cs
+	mov 	[reg_array + 16*8], rax
+	mov 	rax, [rsp+8*2] ; rflags
+	mov 	[reg_array + 17*8], rax
+	mov 	rax, [rsp+8*3] ; rsp
+	mov 	[reg_array + 18*8], rax
+	mov 	rax, [rsp+8*4] ; ss
+	mov 	[reg_array + 19*8], rax
+
+	jmp 	.continue
+
+.doNotCapture:
+	pop rax
+
+.continue:
 	irqHandlerMaster 1
 
 ;Cascade pic never called
@@ -142,23 +195,17 @@ _exception0Handler:
 _exception6Handler:
 	exceptionHandler 6
 
-syscallIntRoutine:
-	pushState
-	sti
-	mov r8, rdx
-	mov rdi, rax
-	mov rsi, rbx
-	mov rdx, rcx
-	mov rcx, r8
-	call int80Dispatcher
-	cli
-	mov [rsp + 14*8], rax
-	popState
-	iretq
+_irq128Handler:
+    pushState
+    cmp rax, 23
+    jge .syscall_end
+    call [syscalls + rax * 8]
 
-getSyscallIntRoutineAddr:
-	lea rax, [rel syscallIntRoutine]
-	ret
+.syscall_end:
+    mov [aux], rax
+    popState
+    mov rax, [aux]
+    iretq
 
 haltcpu:
 	cli
@@ -167,3 +214,10 @@ haltcpu:
 
 SECTION .bss
 	aux resq 1
+	; # de registros
+	reg_array resq 20 
+	pressed_key resq 1
+	SNAPSHOT_KEY equ 0x1D
+
+SECTION .data 
+	userland equ 0x400000 

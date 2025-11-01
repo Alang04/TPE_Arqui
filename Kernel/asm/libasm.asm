@@ -1,6 +1,14 @@
 GLOBAL cpuVendor
 GLOBAL getTime
 GLOBAL getPressedKey
+GLOBAL getSeconds
+GLOBAL getMinutes
+GLOBAL getHour
+GLOBAL getDayOfMonth
+GLOBAL getMonth
+GLOBAL getYear
+GLOBAL inb
+GLOBAL outb
 
 section .text
 	
@@ -28,7 +36,6 @@ cpuVendor:
 	ret
 
 getTime:
-	; recibe en rdi el puntero al buffer de respuesta
 	push rbp
 	mov rbp, rsp 
 
@@ -80,12 +87,39 @@ getYear:
 	in al, 0x71
 	ret
 
+getDayOfMonth:
+	mov al, 7
+	out 0x70, al
+	in al, 0x71
+	ret
+
 getPressedKey:
 	xor rax, rax 
+
 .loop:
 	in al, 64h
 	and al, 0x01
-	jz .loop ; si no tiene tecla se queda esperando
-	; ahora tiene tecla
+	jz .loop
 	in al, 60h
+	ret
+
+outb:
+	push rbp
+	mov rbp, rsp
+
+	mov dx, di
+	mov al, sil
+	out dx, al
+
+	pop rbp
+	ret
+
+inb:
+	push rbp	
+	mov rbp, rsp
+
+	mov dx, di 
+	in al, dx 
+
+	pop rbp
 	ret

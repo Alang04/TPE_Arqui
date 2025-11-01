@@ -2,6 +2,7 @@
      "files.associations": {
           "videodriver.h": "c",
           "lib.h": "c",
-          "timer.h": "c"
+          "timer.h": "c",
+          "compare": "c"
      }
 }

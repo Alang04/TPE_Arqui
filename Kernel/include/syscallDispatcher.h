@@ -2,8 +2,14 @@
 #define SYSCALLDISPATCHER_H
 
 #include <stdint.h>
+#include "defs.h"
 
-// Función que llamará el wrapper de ensamblador de int 80h
-uint64_t int80Dispatcher(uint64_t rax, uint64_t rbx, uint64_t rcx, uint64_t rdx);
+extern void * syscalls[CANT_SYS];
+
+uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count);
+uint64_t sys_read(char * buff, uint64_t count);
+uint64_t sys_registers(char * buff);
+void sys_time(uint8_t * buff);
+void sys_date(uint8_t * buff);
 
 #endif

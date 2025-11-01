@@ -41,17 +41,8 @@ static void putchar(char c) {
 }
 
 static char getchar() {
-    char c = 0;
-    while (c == 0) {
-        _int80(SYSCALL_WRITE, STDOUT, (uint64_t)"[usr] before read\n", 18);
-        c = _int80(SYSCALL_READ, STDIN, 0, 0);
-        if (c) {
-            char msg[24] = "[usr] after read: X\n";
-            msg[18] = c ? c : '?';
-            _int80(SYSCALL_WRITE, STDOUT, (uint64_t)msg, 21);
-        }
-    }
-    return c;
+    // Read blocks until a key is available.
+    return (char)_int80(SYSCALL_READ, STDIN, 0, 0);
 }
 
 static void print_prompt() {

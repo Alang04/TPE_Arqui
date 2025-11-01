@@ -15,4 +15,17 @@
 #define ACS_DATA        (ACS_PRESENT | ACS_DSEG | ACS_WRITE)
 #define ACS_STACK       (ACS_PRESENT | ACS_DSEG | ACS_WRITE)
 
+#define MIN_CHAR 0
+#define MAX_CHAR 256
+#define CANT_SYS 2
+#define STDOUT 1
+#define STDERR 2
+#define TEXT_SIZE 1
+#define FONT_WIDTH 8
+#define FONT_HEIGHT 16
+#define X_UPDATE FONT_WIDTH * TEXT_SIZE
+#define Y_UPDATE FONT_HEIGHT * TEXT_SIZE
+#define BUFF_LENGTH 256
+#define REGISTERS_BUFFER_SIZE 512
+
 #endif

@@ -3,9 +3,8 @@
 #include <lib.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
-#include <videoDriver.h>
 #include <idtLoader.h>
-#include <timer.h>
+#include <time.h>
 #include <interrupts.h>
 #include <keyboardDriver.h>
 
@@ -15,38 +14,20 @@ extern uint8_t data;
 extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
-
 static const uint64_t PageSize = 0x1000;
 static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
-static void printHex64(uint64_t value);
 
 typedef int (*EntryPoint)();
 
 int main(){
-    	printString("Kernel listo. Cargando IDT...\n");
-    	load_idt();
+    _sti();
 
-	printString("Module[0] qword: ");
-	printHex64(*(uint64_t*)sampleCodeModuleAddress);
-	printString("\n");
-	printString("Module[0] text preview: ");
-	printString((const char*)0x401000);
-	printString("\n");
+    EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
 
-	printString("Habilitando interrupciones (STI)...\n");
-	_sti();
-	printString("STI ejecutado.\n");
+    userlandMain();
 
-	EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
-	printString("Saltando a User Space (0x400000)...\n\n");
-
-	userlandMain();
-
-    	printString("\nFin de la ejecucion.");
-    	while(1);
-    
-    	return 0;
+	return 0;
 }
 
 void clearBSS(void * bssAddress, uint64_t bssSize){
@@ -56,31 +37,17 @@ void clearBSS(void * bssAddress, uint64_t bssSize){
 void * getStackBase(){
 	return (void*)(
 		(uint64_t)&endOfKernel
-		+ PageSize * 8			//The size of the stack itself, 32KiB
-		- sizeof(uint64_t)		//Begin at the top of the stack
+		+ PageSize * 8	
+		- sizeof(uint64_t)
 	);
 }
 
 void * initializeKernelBinary(){
-	
-	void * moduleAddresses[] ={
-		sampleCodeModuleAddress,
-		sampleDataModuleAddress
-	};
+	void * moduleAddresses[] ={sampleCodeModuleAddress, sampleDataModuleAddress};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
 	clearBSS(&bss, &endOfKernel - &bss);
+	load_idt();
 	return getStackBase();
 }
 
-static void printHex64(uint64_t value) {
-	char buffer[19];
-	buffer[0] = '0';
-	buffer[1] = 'x';
-	for (int i = 0; i < 16; i++) {
-		uint8_t nibble = (value >> (60 - i * 4)) & 0xF;
-		buffer[2 + i] = (nibble < 10) ? ('0' + nibble) : ('A' + nibble - 10);
-	}
-	buffer[18] = '\0';
-	printString(buffer);
-}
