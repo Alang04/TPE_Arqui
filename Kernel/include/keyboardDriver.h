@@ -1,15 +1,15 @@
 #ifndef KEYBOARDDRIVER_H
 #define KEYBOARDDRIVER_H
 
+
+#include <defs.h>
 #include <stdint.h>
 
-void printPressedKey();
-void readLineVBE(char *buffer, unsigned long maxLen, uint32_t *x, uint32_t y, uint32_t color);
-char readKeyAsciiBlockingVBE(uint32_t *x, uint32_t y, uint32_t color);
-void keyboard_irq_producer(void);
-void write(unsigned char c);
-void erase();
-void clear();
+//void printPressedKey();
+void writeBuff(unsigned char c);
+void clearBuff();
+uint64_t readBuff(char * out_buf, unsigned long maxLen);
+void handlePressedKey();
 uint64_t copyRegistersBuffer(char * copy);
 
 #endif

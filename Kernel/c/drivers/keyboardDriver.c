@@ -1,53 +1,57 @@
-#include <keyboardDriver.h>
-#include <lib.h>
-#include <naiveConsole.h>
 #include <videoDriver.h>
-#include <stdint.h>
+#include <keyboardDriver.h>
+#include <naiveConsole.h>
 #include <defs.h>
 
-char scancode_to_ascii[128] = {
+extern uint8_t getPressedKey();
+
+char kbd_min[KBD_LENGTH] = {
     0,  27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b', // backspace
     '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n',     //tab y enter
     0,'a','s','d','f','g','h','j','k','l',';','\'','`',
     0,'\\','z','x','c','v','b','n','m',',','.','/', 0, '*',
-    0,' ', // espacio
-    // ... (resto omitido)
+    0,' ',
 };
 
+char kbd_mayus[KBD_LENGTH] = {
+    0,  27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', // backspace
+    '\t','Q','W','E','R','T','Y','U','I','O','P','{','}','\n',     // tab y enter
+    0,'A','S','D','F','G','H','J','K','L',':','"','~',
+    0,'|','Z','X','C','V','B','N','M','<','>','?', 0, '*',
+    0,' ',
+};
+
+char * kbd_manager[] = {kbd_min, kbd_mayus};
+
 static char buff[BUFF_LENGTH];
-static char registersBuffer[REGISTERS_BUFFER_SIZE];
+//static char registersBuffer[REGISTERS_BUFFER_SIZE];
+static int shift = 0;
+static int caps = 0;
 int buff_size = 0;
 int start_index = 0;
 int end_index = 0;
 
-void write(unsigned char c){
-    if(buff_size < BUFF_LENGTH){
-        buff[end_index] = c;
-        end_index = (end_index + 1) % BUFF_LENGTH;
-        buff_size++;
-    }
+void writeBuff(unsigned char c){
+    buff[end_index] = c;
+    end_index = (end_index + 1) % BUFF_LENGTH;
+    buff_size = (buff_size + 1) % BUFF_LENGTH;
+    printString("Entre a writeBuff", 0, 0, 0xFFFFFF, 1);      
+    putChar(c, 0xFFFFFF);
 }
 
-void erase(){
-    if(buff_size > 0){
-        start_index = (start_index + 1) % BUFF_LENGTH;
-        buff_size--;
-    }
-}
-
-void clear(){
+void clearBuff(){
     buff_size = 0;
     start_index = 0;
     end_index = 0;
 }
 
-void read(char * out_buf, unsigned long maxLen){
+uint64_t readBuff(char * out_buf, unsigned long maxLen){
     unsigned long i = 0;
-    while(i < maxLen){
-        while(buff_size == 0); // espera activa
-
+    while(i < maxLen && buff_size > 0){
         char c = buff[start_index];
-        erase();
+
+        buff_size--;
+        start_index = (start_index + 1) % BUFF_LENGTH;
 
         if(c == '\n' || c == '\r'){
             out_buf[i] = 0;
@@ -59,15 +63,17 @@ void read(char * out_buf, unsigned long maxLen){
                 // borrar del display
                 ncPrintChar('\b');
             }
-            continue;
+        } else{
+            //if((unsigned char)c < 32) continue;
+            out_buf[i] = c;
+            i++;
+            ncPrintChar(c);
         }
-        if((unsigned char)c < 32) continue;
-
-        out_buf[i] = c;
-        i++;
-        ncPrintChar(c);
+        printString("Entre a readBuff", 0, 0, 0xFFFFFF, 1);      
+        putChar(c, 0xFFFFFF);
     }
     out_buf[i] = 0;
+    return i;
 }
 
 void printPressedKey(){
@@ -77,66 +83,30 @@ void printPressedKey(){
             continue; // ignora la liberacion de teclas 
         }
         if(scancode < 128){
-            //printChar(scancode_to_ascii[scancode]);
-        }
-    }
-}
-
-
-
-// Lee una tecla y la dibuja en modo gráfico VBE
-char readKeyAsciiBlockingVBE(uint32_t *x, uint32_t y, uint32_t color) {
-    while (1){
-        uint8_t sc = (uint8_t)getPressedKey();
-
-        if (sc >= 128) continue;
-        char ascii = scancode_to_ascii[sc];
-        if (ascii != 0) {
-            if((unsigned char)ascii >= 32){
-                drawFigure(*x, y, ascii, color);
-                *x += 8;
-            }
-            return ascii;
-        }
-    }
-}
-
-// Lee una línea de texto en modo gráfico VBE y la deja en buffer
-void readLineVBE(char *buffer, unsigned long maxLen, uint32_t *x, uint32_t y, uint32_t color) {
-    if (maxLen == 0) return;
-    unsigned long pos = 0;
-    buffer[0] = 0;
-    for (;;) {
-        char c = readKeyAsciiBlockingVBE(x, y, color);
-        if (c == 0) continue;
-        if (c == '\n' || c == '\r') {
-            buffer[pos] = 0;
-            return;
-        }
-        if (c == '\b') {
-            if (pos > 0) {
-                pos--;
-                buffer[pos] = 0;
-                *x -= 8;
-                // Borra el último carácter dibujando un rectángulo negro
-                // helperFilledRect(*x, y, 8, 16, 0x000000);
-            }
-            continue;
-        }
-        if ((unsigned char)c < 32) continue;
-        if (pos < maxLen - 1) {
-            buffer[pos++] = c;
-            buffer[pos] = 0;
+            printChar(0, 0, kbd_manager[(shift + caps) % 2][scancode], 0xFFFFFF, 1);
         }
     }
 }
 
 void handlePressedKey(){
     uint8_t scancode = getPressedKey();
-    write(scancode_to_ascii[scancode]);
-    return;
+
+    if(scancode == L_ARROW || scancode == R_ARROW || scancode == UP_ARROW || scancode == DOWN_ARROW || scancode == 0 || scancode > BREAK_CODE){
+        return;
+    } else if(scancode == L_SHIFT || scancode == R_SHIFT){
+        shift = 1;
+    } else if(scancode == (L_SHIFT | BREAK_CODE) || scancode == (R_SHIFT | BREAK_CODE)){
+        shift = 0;
+    } else if(scancode == CAPS_LOCK){
+        caps = !caps;
+    } else if(!(scancode & BREAK_CODE)){
+        writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
+    }
+
+    printString("Entre a handlePressedKey", 0, 0, 0xFFFFFF, 1);      
+    putChar(scancode, 0xFFFFFF);
 }
 
 uint64_t copyRegistersBuffer(char * copy){
-    // IMPLEMENTAR
+    return 0;
 }

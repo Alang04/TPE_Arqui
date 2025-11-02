@@ -3,6 +3,10 @@
           "videodriver.h": "c",
           "lib.h": "c",
           "timer.h": "c",
-          "compare": "c"
+          "compare": "c",
+          "keyboarddriver.h": "c",
+          "naiveconsole.h": "c",
+          "defs.h": "c",
+          "syscalldispatcher.h": "c"
      }
 }

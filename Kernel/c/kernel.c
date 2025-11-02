@@ -3,6 +3,7 @@
 #include <lib.h>
 #include <moduleLoader.h>
 #include <naiveConsole.h>
+#include <videoDriver.h>
 #include <idtLoader.h>
 #include <time.h>
 #include <interrupts.h>
@@ -24,7 +25,13 @@ int main(){
     _sti();
 
     EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
-
+	// Limpio pantalla y dibujo algo visible para validar VBE
+	clearScreen(0x000000);
+	printString("Kernel loaded!", 10, 10, 0xFFFFFF, 1);
+	printRectangle(5, 5, 300, 60, 0x00FF00);
+	// Texto con cursor por defecto
+	setDefaultTextSize(1);
+	putChar('\n', 0xFFFFFF);
     userlandMain();
 
 	return 0;

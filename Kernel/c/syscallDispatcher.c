@@ -1,11 +1,13 @@
-#include "../include/syscallDispatcher.h"
-#include "../include/videoDriver.h"
-#include "../include/keyboardDriver.h"
-#include "../include/lib.h"
-#include "../include/defs.h"
+#include <syscallDispatcher.h>
+#include <videoDriver.h>
+#include <keyboardDriver.h>
+#include <lib.h>
+#include <defs.h>
+#include <time.h>
 
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
     uint32_t color = 0xFFFFFF;
+    printString("Entre a sys_write", 0, 0, 0xFFFFFF, 1);
    
     for(int i = 0; i < count; i++){
         putChar(buff[i], color);
@@ -15,7 +17,8 @@ uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
 }
 
 uint64_t sys_read(char * buff, uint64_t count){
-   return read(buff, count);
+    printString("Entre a sys_read", 0, 0, 0xFFFFFF, 1);
+   return readBuff(buff, count);
 }
 
 void sys_date(uint8_t * buff){

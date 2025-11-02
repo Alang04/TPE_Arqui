@@ -18,4 +18,9 @@ int abs(int x);
 void drawFigure(uint32_t x, uint32_t y, char c, uint32_t color);
 void newLine();
 
+// Extras útiles para el proyecto
+void clearScreen(uint32_t color);
+void setDefaultTextSize(uint64_t size);
+uint64_t getDefaultTextSize(void);
+
 #endif

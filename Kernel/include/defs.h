@@ -17,7 +17,7 @@
 
 #define MIN_CHAR 0
 #define MAX_CHAR 256
-#define CANT_SYS 2
+#define CANT_SYS 5
 #define STDOUT 1
 #define STDERR 2
 #define TEXT_SIZE 1
@@ -27,5 +27,14 @@
 #define Y_UPDATE FONT_HEIGHT * TEXT_SIZE
 #define BUFF_LENGTH 256
 #define REGISTERS_BUFFER_SIZE 512
+#define KBD_LENGTH 128
+#define L_SHIFT 0x2A
+#define R_SHIFT 0x36
+#define CAPS_LOCK 0x3A
+#define BREAK_CODE 0x80
+#define L_ARROW 0x4B
+#define R_ARROW 0x4D
+#define UP_ARROW 0x48
+#define DOWN_ARROW 0x50
 
 #endif
