@@ -36,7 +36,7 @@ void writeBuff(unsigned char c){
     end_index = (end_index + 1) % BUFF_LENGTH;
     buff_size = (buff_size + 1) % BUFF_LENGTH;
     printString("Entre a writeBuff", 0, 0, 0xFFFFFF, 1);      
-    putChar(c, 0xFFFFFF);
+    videoPutChar(c, 0xFFFFFF);
 }
 
 void clearBuff(){
@@ -57,6 +57,7 @@ uint64_t readBuff(char * out_buf, unsigned long maxLen){
             out_buf[i] = 0;
             return;
         }
+        
         if(c == '\b'){
             if(i > 0){
                 i--;
@@ -70,23 +71,12 @@ uint64_t readBuff(char * out_buf, unsigned long maxLen){
             ncPrintChar(c);
         }
         printString("Entre a readBuff", 0, 0, 0xFFFFFF, 1);      
-        putChar(c, 0xFFFFFF);
+        videoPutChar(c, 0xFFFFFF);
     }
     out_buf[i] = 0;
     return i;
 }
 
-void printPressedKey(){
-    while(1){
-        uint8_t scancode = getPressedKey();
-        if(scancode & 0x80){
-            continue; // ignora la liberacion de teclas 
-        }
-        if(scancode < 128){
-            printChar(0, 0, kbd_manager[(shift + caps) % 2][scancode], 0xFFFFFF, 1);
-        }
-    }
-}
 
 void handlePressedKey(){
     uint8_t scancode = getPressedKey();
@@ -104,7 +94,7 @@ void handlePressedKey(){
     }
 
     printString("Entre a handlePressedKey", 0, 0, 0xFFFFFF, 1);      
-    putChar(scancode, 0xFFFFFF);
+    videoPutChar(scancode, 0xFFFFFF);
 }
 
 uint64_t copyRegistersBuffer(char * copy){

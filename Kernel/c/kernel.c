@@ -22,16 +22,9 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 typedef int (*EntryPoint)();
 
 int main(){
-    _sti();
+	_sti();
 
-    EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;
-	// Limpio pantalla y dibujo algo visible para validar VBE
-	clearScreen(0x000000);
-	printString("Kernel loaded!", 10, 10, 0xFFFFFF, 1);
-	printRectangle(5, 5, 300, 60, 0x00FF00);
-	// Texto con cursor por defecto
-	setDefaultTextSize(1);
-	putChar('\n', 0xFFFFFF);
+    EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;	
     userlandMain();
 
 	return 0;

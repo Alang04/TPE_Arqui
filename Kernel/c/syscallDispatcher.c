@@ -10,7 +10,7 @@ uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
     printString("Entre a sys_write", 0, 0, 0xFFFFFF, 1);
    
     for(int i = 0; i < count; i++){
-        putChar(buff[i], color);
+        videoPutChar(buff[i], color);
     }
 
     return count;
