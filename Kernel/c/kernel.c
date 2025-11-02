@@ -1,13 +1,13 @@
 #include <stdint.h>
 #include <string.h>
-#include <lib.h>
-#include <moduleLoader.h>
-#include <naiveConsole.h>
-#include <videoDriver.h>
-#include <idtLoader.h>
-#include <time.h>
-#include <interrupts.h>
-#include <keyboardDriver.h>
+#include "lib.h"
+#include "moduleLoader.h"
+#include "naiveConsole.h"
+#include "videoDriver.h"
+#include "idtLoader.h"
+#include "time.h"
+#include "interrupts.h"
+#include "keyboardDriver.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -22,6 +22,8 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 typedef int (*EntryPoint)();
 
 int main(){
+	ncPrint("Kernel loaded!\n");
+	printString("Kernel loaded!\n", 100, 100, 0xFFFFFF, 1);
 	((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }
@@ -39,7 +41,7 @@ void * getStackBase(){
 }
 
 void * initializeKernelBinary(){
-	void * moduleAddresses[] ={sampleCodeModuleAddress, sampleDataModuleAddress};
+	void * moduleAddresses[] = {sampleCodeModuleAddress, sampleDataModuleAddress};
 
 	loadModules(&endOfKernelBinary, moduleAddresses);
 	clearBSS(&bss, &endOfKernel - &bss);

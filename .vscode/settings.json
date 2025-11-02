@@ -7,6 +7,7 @@
           "keyboarddriver.h": "c",
           "naiveconsole.h": "c",
           "defs.h": "c",
-          "syscalldispatcher.h": "c"
+          "syscalldispatcher.h": "c",
+          "moduleloader.h": "c"
      }
 }

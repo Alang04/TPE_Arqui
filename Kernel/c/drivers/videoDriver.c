@@ -1,7 +1,8 @@
-#include <videoDriver.h>
-#include <font.h>
+#include "videoDriver.h"
+#include "font.h"
 #include <stdint.h>
-#include <defs.h>
+#include "defs.h"
+#include <string.h>
 
 typedef struct vbe_mode_info_structure{
     uint16_t attributes;
@@ -43,7 +44,6 @@ static vbe_mode_info_t * vbe_mode_info = (vbe_mode_info_t *) 0x5C00;
 
 static int currentX = 0;
 static int currentY = 0;
-static const int fontColor = 0xFFFFFF; // Blanco
 static const int bgColor = 0x000000;   // Negro
 static uint64_t defaultTextSize = TEXT_SIZE; // Tamaño por defecto (ajustable)
 
@@ -65,22 +65,59 @@ uint64_t getDefaultTextSize(void){
     return defaultTextSize;
 }
 
-/* MODO TEXTO. */
+int validPosition(uint64_t x,  uint64_t y){
+    return x < vbe_mode_info->width && y < vbe_mode_info->height;
+}
 
-void scroll(){
-    uint64_t line_height = defaultTextSize * FONT_HEIGHT;
-    uint8_t * framebuffer = (uint8_t *) vbe_mode_info->framebuffer;
-    
-    for(uint64_t src_y = line_height; src_y < vbe_mode_info->height; src_y++){
-        uint64_t dst_y = src_y - line_height;
-        uint64_t src_offset = src_y * vbe_mode_info->pitch;
-        uint64_t dst_offset = dst_y * vbe_mode_info->pitch;
-        memcpy(framebuffer + dst_offset, framebuffer + src_offset, vbe_mode_info->pitch);
+/* FUNCIONES DEMODO TEXTO. */
+
+void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
+    if(!validPosition(x, y)){
+        return;
     }
 
-    uint64_t last_line_start = vbe_mode_info->height - line_height;
+    uint8_t *framebuffer = (uint8_t *)(uintptr_t)vbe_mode_info->framebuffer;
+    uint32_t bpp = vbe_mode_info->bpp;
 
-    fillRectangle(0, last_line_start, vbe_mode_info->width, vbe_mode_info->height, bgColor);
+    uint32_t bytesPerPixel = (bpp + 7) / 8;
+    uint64_t offset = y * (uint64_t)vbe_mode_info->pitch + x * bytesPerPixel;
+
+    for(uint32_t i = 0; i < bytesPerPixel; i++){
+        framebuffer[offset + i] = (hexColor >> (8 * i)) & 0xFF;
+    }
+}
+
+void scroll(){
+    uint64_t lineHeight = defaultTextSize * FONT_HEIGHT;
+    uint8_t * framebuffer = (uint8_t *) vbe_mode_info->framebuffer;
+    
+    for(uint64_t srcY = lineHeight; srcY < vbe_mode_info->height; srcY++){
+        uint64_t dstY = srcY - lineHeight;
+        uint64_t srcOffset = srcY * vbe_mode_info->pitch;
+        uint64_t dstOffset = dstY * vbe_mode_info->pitch;
+        memcpy(framebuffer + dstOffset, framebuffer + srcOffset, vbe_mode_info->pitch);
+    }
+
+    uint64_t lastLineStart = vbe_mode_info->height - lineHeight;
+
+    fillRectangle(0, lastLineStart, vbe_mode_info->width, vbe_mode_info->height, bgColor);
+}
+
+void newLine(){
+    currentX = 0;
+
+    uint64_t stepY = (uint64_t)defaultTextSize * FONT_HEIGHT;
+
+    if(currentY + stepY < vbe_mode_info->height){
+
+        currentY += stepY;
+        fillRectangle(0, currentY, vbe_mode_info->width, currentY + stepY, bgColor);
+
+    } else{
+
+        scroll();
+        currentY = vbe_mode_info->height - stepY;
+    }
 }
 
 void videoPutChar(uint8_t c, uint32_t color){
@@ -99,7 +136,7 @@ void videoPrint(const char *str, uint32_t color){
         return;
     }
     
-    for(unsigned int i = 0; str[i] != '\0'; i++) {
+    for(unsigned int i = 0; str[i] != '\0'; i++){
         videoPutChar((uint8_t)str[i], color);
     }
 }
@@ -119,45 +156,17 @@ void updateCursor(){
     }
 }
 
-void newLine(){
-    currentX = 0;
-    uint64_t stepY = (uint64_t)defaultTextSize * FONT_HEIGHT;
-
-    if(currentY + stepY < vbe_mode_info->height){
-        currentY += stepY;
-        fillRectangle(0, currentY, vbe_mode_info->width, currentY + stepY, bgColor);
-
-    } else{
-
-        scroll();
-        currentY = vbe_mode_info->height - stepY;
-    }
-}
-
 void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size){
     if(str == 0){
         return;
     }
-    setDefaultTextSize(size);
+
     for(unsigned long int i = 0; str[i] != '\0'; i++){
         drawChar((uint32_t)(x + (uint64_t)FONT_WIDTH * size * i), (uint32_t)y, (uint8_t)str[i], color, size);
     }
 }
 
-void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
-    if(!validPosition(x, y)){
-        return;
-    }
 
-    uint32_t bpp = vbe_mode_info->bpp;
-    uint8_t *framebuffer = (uint8_t *)(uintptr_t)vbe_mode_info->framebuffer;
-
-    uint32_t bytes_per_pixel = (bpp + 7) / 8;
-    uint64_t offset = y * (uint64_t)vbe_mode_info->pitch + x * bytes_per_pixel;
-    for(uint32_t i = 0; i < bytes_per_pixel; i++){
-        framebuffer[offset + i] = (hexColor >> (8 * i)) & 0xFF;
-    }
-}
 
 /* MODO GRAFICO */
 
@@ -193,7 +202,10 @@ void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color
 }
 
 void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
-    if (x1 <= x0 || y1 <= y0) return;
+    if (x1 <= x0 || y1 <= y0){
+        return;
+    }
+
     if(!validPosition(x0, y0)){
         return;
     }
@@ -214,14 +226,21 @@ void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t 
             for(uint32_t b = 0; b < bytes_per_pixel; b++){
                 framebuffer[off + b] = (color >> (8 * b)) & 0xFF;
             }
+
         }
     }
 }
 
 void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
     // Normaliza coordenadas
-    if (x1 < x0) { uint64_t t = x0; x0 = x1; x1 = t; }
-    if (y1 < y0) { uint64_t t = y0; y0 = y1; y1 = t; }
+    if(x1 < x0){ 
+        uint64_t t = x0; x0 = x1; x1 = t;
+    }
+
+    if(y1 < y0){
+        uint64_t t = y0; y0 = y1; y1 = t;
+    }
+
     // Lados
     drawLine(x0, y0, x1, y0, color);
     drawLine(x1, y0, x1, y1, color);
@@ -237,17 +256,19 @@ void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_
     if (str == 0){
         return;
     }
+
     for(unsigned int i = 0; str[i] != '\0'; i++){
         drawChar((uint32_t)(x + (uint64_t)FONT_WIDTH * size * i), (uint32_t)y, (uint8_t)str[i], color, size);
     }
 }
 
 void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
-    if(c >= 128){
+    if (c >= 128){
         return;
     }
 
     for(int i = 0; i < FONT_HEIGHT; i++){
+
         uint8_t line = font[c][i];
 
         for(int j = 0; j < FONT_WIDTH; j++){
@@ -257,14 +278,9 @@ void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
                 for(uint64_t dy = 0; dy < size; dy++){
 
                     for(uint64_t dx = 0; dx < size; dx++){
-                        putPixel(color, x + (uint64_t)j * size + dx, y + (uint64_t)i * size + dy);
-                    }
-                }
-            } else{
-                for(uint64_t dy = 0; dy < size; dy++){
 
-                    for(uint64_t dx = 0; dx < size; dx++){
-                        putPixel(bgColor, x + (uint64_t)j * size + dx, y + (uint64_t)i * size + dy);
+                        putPixel(color, x + (uint64_t)j * size + dx, y + (uint64_t)i * size + dy);
+
                     }
                 }
             }
@@ -274,8 +290,4 @@ void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
 
 void clearScreen(uint32_t color){
     drawFilledRect(0, 0, vbe_mode_info->width, vbe_mode_info->height, color);
-}
-
-int validPosition(uint64_t x,  uint64_t y){
-    return x < vbe_mode_info->width && y < vbe_mode_info->height;
 }

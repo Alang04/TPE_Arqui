@@ -95,7 +95,6 @@ getDayOfMonth:
 
 getPressedKey:
 	xor rax, rax 
-
 .loop:
 	in al, 64h
 	and al, 0x01

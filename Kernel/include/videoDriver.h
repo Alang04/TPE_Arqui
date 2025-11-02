@@ -10,6 +10,7 @@ void printChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size)
 void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
 void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
+void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 void printFillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 void helperFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color);
 void putChar(uint8_t c, uint32_t color);
@@ -22,6 +23,7 @@ void videoPutChar(uint8_t c, uint32_t color);
 void videoPrint(const char *str, uint32_t color);
 void moveRight();
 void updateCursor();
+int validPosition(uint64_t x,  uint64_t y);
 
 // Extras útiles para el proyecto
 void clearScreen(uint32_t color);

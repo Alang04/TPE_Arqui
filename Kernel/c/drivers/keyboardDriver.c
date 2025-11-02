@@ -1,7 +1,7 @@
-#include <videoDriver.h>
-#include <keyboardDriver.h>
-#include <naiveConsole.h>
-#include <defs.h>
+#include "videoDriver.h"
+#include "keyboardDriver.h"
+#include "naiveConsole.h"
+#include "defs.h"
 
 extern uint8_t getPressedKey();
 
@@ -35,7 +35,6 @@ void writeBuff(unsigned char c){
     buff[end_index] = c;
     end_index = (end_index + 1) % BUFF_LENGTH;
     buff_size = (buff_size + 1) % BUFF_LENGTH;
-    printString("Entre a writeBuff", 0, 0, 0xFFFFFF, 1);      
     videoPutChar(c, 0xFFFFFF);
 }
 
@@ -70,7 +69,6 @@ uint64_t readBuff(char * out_buf, unsigned long maxLen){
             i++;
             ncPrintChar(c);
         }
-        printString("Entre a readBuff", 0, 0, 0xFFFFFF, 1);      
         videoPutChar(c, 0xFFFFFF);
     }
     out_buf[i] = 0;
@@ -92,8 +90,6 @@ void handlePressedKey(){
     } else if(!(scancode & BREAK_CODE)){
         writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
     }
-
-    printString("Entre a handlePressedKey", 0, 0, 0xFFFFFF, 1);      
     videoPutChar(scancode, 0xFFFFFF);
 }
 

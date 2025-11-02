@@ -4,5 +4,7 @@
 void timer_handler();
 int ticks_elapsed();
 int seconds_elapsed();
+void date(unsigned char *buff);
+void time(unsigned char *buff);
 
 #endif
