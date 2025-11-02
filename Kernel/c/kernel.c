@@ -22,11 +22,7 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 typedef int (*EntryPoint)();
 
 int main(){
-	_sti();
-
-    EntryPoint userlandMain = (EntryPoint)sampleCodeModuleAddress;	
-    userlandMain();
-
+	((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }
 
