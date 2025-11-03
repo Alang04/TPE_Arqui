@@ -1,45 +1,31 @@
 include Makefile.inc
 
-AS := nasm
-ASFLAGS := -felf64
+KERNEL=kernel.bin
+# C sources live under c/ and c/drivers/
+SOURCES=$(wildcard c/*.c c/drivers/*.c)
+SOURCES_ASM=$(wildcard asm/*.asm)
+OBJECTS=$(SOURCES:.c=.o)
+OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
+LOADERSRC=loader.asm
 
-CC := x86_64-linux-gnu-gcc
-CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -fno-builtin -fno-stack-protector -mno-red-zone -Iinclude -nostdlib -U_FORTIFY_SOURCE
-
-LD := x86_64-linux-gnu-ld
-LDFLAGS := --warn-common -z max-page-size=0x1000 -T kernel.ld
-
-ASM_SRCS := loader.asm asm/libasm.asm asm/interrupts.asm
-ASM_OBJS := $(ASM_SRCS:.asm=.o)
-
-C_SRCS := $(shell find c -name '*.c')
-C_OBJS := $(C_SRCS:.c=.o)
-
-OBJS := $(ASM_OBJS) $(C_OBJS)
-
-KERNEL := kernel.bin
-
-.PHONY: all clean
+LOADEROBJECT=$(LOADERSRC:.asm=.o)
+STATICLIBS=
 
 all: $(KERNEL)
 
-# assemble NASM sources
-loader.o: loader.asm
-	$(AS) $(ASFLAGS) loader.asm -o loader.o
+$(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
+	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
 
-asm/libasm.o: asm/libasm.asm
-	$(AS) $(ASFLAGS) asm/libasm.asm -o asm/libasm.o
+%.o: %.c
+	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
 
-asm/interrupts.o: asm/interrupts.asm
-	$(AS) $(ASFLAGS) asm/interrupts.asm -o asm/interrupts.o
+%.o : %.asm
+	$(ASM) $(ASMFLAGS) $< -o $@
 
-# compile C sources
-c/%.o: c/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# link kernel
-$(KERNEL): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS)
+$(LOADEROBJECT):
+	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	rm -f $(KERNEL) $(OBJS)
+	rm -rf asm/*.o *.o *.bin
+
+.PHONY: all clean

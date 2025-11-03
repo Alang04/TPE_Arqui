@@ -22,8 +22,6 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 typedef int (*EntryPoint)();
 
 int main(){
-	ncPrint("Kernel loaded!\n");
-	printString("Kernel loaded!\n", 100, 100, 0xFFFFFF, 1);
 	((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }
