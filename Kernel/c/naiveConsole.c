@@ -1,7 +1,5 @@
 #include "naiveConsole.h"
 
-static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base);
-
 static char buffer[64] = { '0' };
 static uint8_t * const video = (uint8_t*)0xB8000;
 static uint8_t * currentVideo = (uint8_t*)0xB8000;
@@ -83,8 +81,8 @@ void ncNewline(){
 	while((uint64_t)(currentVideo - video) % (width * 2) != 0);
 }
 
-static uint32_t uintToBase(uint64_t value, char * buffer, uint32_t base){
-	char *p = buffer;
+uint32_t uintToBase(uint64_t value, char * buff, uint32_t base){
+	char *p = buff;
 	char *p1, *p2;
 	uint32_t digits = 0;
 

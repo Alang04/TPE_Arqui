@@ -16,6 +16,7 @@ GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
 GLOBAL getSyscallIntRoutineAddr
 GLOBAL pressed_key
+GLOBAL regsArray
 EXTERN irqDispatcher
 EXTERN int80Dispatcher
 EXTERN exceptionDispatcher
@@ -77,11 +78,7 @@ SECTION .text
 
 %macro exceptionHandler 1
 	pushState
-
-	; primer parámetro: número de excepción
 	mov rdi, %1 
-
-	; segundo parámetro: puntero al contexto (registros en el stack)
 	mov rsi, rsp
 	call exceptionDispatcher
 
@@ -138,32 +135,31 @@ _irq01Handler:
 	pop 	rax
 	mov 	rax, 15
 	mov 	r8, 10
-	mov 	[reg_array + 0*8],  rax
-	mov 	[reg_array + 1*8],  rbx
-	mov 	[reg_array + 2*8],  rcx
-	mov 	[reg_array + 3*8],  rdx
-	mov 	[reg_array + 4*8],  rbp
-	mov 	[reg_array + 5*8],  rdi
-	mov 	[reg_array + 6*8],  rsi
-	mov 	[reg_array + 7*8],  r8
-	mov 	[reg_array + 8*8],  r9
-	mov 	[reg_array + 9*8], r10
-	mov 	[reg_array + 10*8], r11
-	mov 	[reg_array + 11*8], r12
-	mov 	[reg_array + 12*8], r13
-	mov 	[reg_array + 13*8], r14
-	mov 	[reg_array + 14*8], r15
-	mov 	rax, [rsp+8*0] ; rip
-	mov 	[reg_array + 15*8], rax
-	mov 	rax, [rsp+8*1] ; cs
-	mov 	[reg_array + 16*8], rax
-	mov 	rax, [rsp+8*2] ; rflags
-	mov 	[reg_array + 17*8], rax
-	mov 	rax, [rsp+8*3] ; rsp
-	mov 	[reg_array + 18*8], rax
-	mov 	rax, [rsp+8*4] ; ss
-	mov 	[reg_array + 19*8], rax
-
+	mov 	[regsArray + 0 * 8],  rax
+	mov 	[regsArray + 1 * 8],  rbx
+	mov 	[regsArray + 2 * 8],  rcx
+	mov 	[regsArray + 3 * 8],  rdx
+	mov 	[regsArray + 4 * 8],  rbp
+	mov 	[regsArray + 5 * 8],  rdi
+	mov 	[regsArray + 6 * 8],  rsi
+	mov 	[regsArray + 7 * 8],  r8
+	mov 	[regsArray + 8 * 8],  r9
+	mov 	[regsArray + 9 * 8],  r10
+	mov 	[regsArray + 10 * 8], r11
+	mov 	[regsArray + 11 * 8], r12
+	mov 	[regsArray + 12 * 8], r13
+	mov 	[regsArray + 13 * 8], r14
+	mov 	[regsArray + 14 * 8], r15
+	mov 	rax, [rsp + 8 * 0] ; rip
+	mov 	[regsArray + 15 * 8], rax
+	mov 	rax, [rsp + 8 * 1] ; cs
+	mov 	[regsArray + 16 * 8], rax
+	mov 	rax, [rsp + 8 * 2] ; rflags
+	mov 	[regsArray + 17 * 8], rax
+	mov 	rax, [rsp + 8 * 3] ; rsp
+	mov 	[regsArray + 18 * 8], rax
+	mov 	rax, [rsp + 8 * 4] ; ss
+	mov 	[regsArray + 19 * 8], rax
 	jmp 	.continue
 
 .doNotCapture:
@@ -216,7 +212,7 @@ haltcpu:
 SECTION .bss
 	aux resq 1
 	; # de registros
-	reg_array resq 20 
+	regsArray resq 20 
 	pressed_key resq 1
 	SNAPSHOT_KEY equ 0x1D
 

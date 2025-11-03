@@ -178,6 +178,13 @@ void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64
     }
 }
 
+void setTextSize(uint8_t size){
+    if(size == 0){
+        size = 1;
+    }
+
+    defaultTextSize = size;
+}
 
 
 /* MODO GRAFICO */

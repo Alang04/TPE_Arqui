@@ -2,6 +2,7 @@
 #include "../include/keyboardDriver.h"
 #include "../include/naiveConsole.h"
 #include "../include/defs.h"
+#include "../include/lib.h"
 #include <stdint.h>
 
 //extern uint8_t getPressedKey();
@@ -33,10 +34,9 @@ static int caps = 0;
 int buff_size = 0;
 int start_index = 0;
 int end_index = 0;
+int boolRegisters = 0;
 
 void writeBuff(unsigned char c){
-
-
     buff[end_index] = c;
     end_index = (end_index + 1) % BUFF_LENGTH;
     if(buff_size < BUFF_LENGTH){
@@ -54,7 +54,7 @@ void clearBuff(){
 
 uint8_t getFromBuffer(){
     if(buff_size == 0){
-        return (uint8_t)-1;
+        return (uint8_t) - 1;
     }
 
     buff_size--;
@@ -91,6 +91,11 @@ void handlePressedKey(){
         shift = 1;
     } else if(scancode == (L_SHIFT | BREAK_CODE) || scancode == (R_SHIFT | BREAK_CODE)){
         shift = 0;
+    } else if(scancode == L_CONTROL){
+        //ARREGLAR PROBLEMA DE CTRL NO GUARDA REGISTROS SOLO CLEAR?
+        storeSnapshot();
+        boolRegisters = 1;
+        return;
     } else if(scancode == CAPS_LOCK){
         caps = !caps;
     } else if(!(scancode & BREAK_CODE)){
@@ -98,6 +103,75 @@ void handlePressedKey(){
     }
 }
 
-uint64_t copyRegistersBuffer(char * copy){
+uint64_t copyRegistersBuffer(char * buff){
+    if(boolRegisters){
+        int i;
+        for(i = 0; registersBuff[i]; i++){
+            buff[i] = registersBuff[i];
+        }
+
+        buff[i] = 0;
+        return 1; 
+    }
+
     return 0;
+}
+
+void storeSnapshot(){
+    char * regs[] = {"RAX: 0x", "RBX: 0x", "RCX: 0x", "RDX: 0x", "RBP: 0x", "RDI: 0x", "RSI: 0x",  
+     "R8: 0x", "R9: 0x", "R10: 0x", "R11: 0x", "R12: 0x", "R13: 0x", "R14: 0x", "R15: 0x", "RIP: 0x", "CS: 0x", "RFLAGS: 0x", "RSP: 0x", "SS: 0x", 0};
+
+    uint32_t j = 0;
+
+    for(int i = 0; regs[i]; i++){
+
+        for(int k = 0; regs[i][k]; k++){
+            registersBuff[j++] = regs[i][k];
+        }
+
+        j += intToHexa(regsArray[i], registersBuff + j);
+
+        registersBuff[j] = '\n';
+        j++;
+    }
+
+  registersBuff[j] = 0;
+}
+
+/* Contrato:
+       - Escribe en `dest` la representación hexadecimal (mayúsculas) del valor
+         usando exactamente hasta 16 dígitos, rellenando con ceros a la izquierda
+         para completar 16 dígitos.
+       - Devuelve la cantidad de caracteres hex escritos (normalmente 16).
+       - No comprueba el tamaño del buffer `dest`; el llamador debe garantizar
+         espacio suficiente (>=16). Si `dest` es NULL la función retorna 0.
+    */
+uint32_t intToHexa(uint64_t value, char *dest){
+    if (!dest){
+        return 0;
+    }
+
+    int zerosPad = 16;
+    uint64_t aux = value;
+
+    /* una iteración por nibble no nulo */
+    while(aux){
+        aux >>= 4;
+        --zerosPad;
+    }
+
+    uint32_t k = 0;
+    for(int i = 0; i < zerosPad; i++){
+        dest[k++] = '0';
+    }
+
+    /* Escribir la parte significativa si value != 0. uintToBase escribe los dígitos
+       y deja un '\0' al final; la función devuelve la cantidad de dígitos escritos. */
+    if(value){
+        k += uintToBase(value, dest + k, 16);
+    }
+
+    dest[k] = 0;
+
+    return k;
 }

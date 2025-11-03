@@ -32,6 +32,16 @@ sys_write:
 	int 0x80
 	ret
 
+sys_increase_fontsize:
+    	mov rax, 5
+	int 0x80
+	ret
+
+sys_decrease_fontsize:
+   	mov rax, 6
+	int 0x80
+	ret
+
 sys_clear:
     mov rax, 13
 	int 0x80

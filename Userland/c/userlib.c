@@ -8,20 +8,43 @@ static Command commands[] = {
     {"clear", clear},
     {"printTime", printTime},
     {"printDate", printDate},
+    {"registers", registers},
+    {"testDiv0", divideByZero},
     {0, 0},
 };
 
 void help(){
     shellPrintString("Comandos disponibles: \n");
-    shellPrintString("help    ->   muestra la lista de comandos.\n");
-    shellPrintString("time    ->   imprime la hora.\n");
-    shellPrintString("div0    ->   division por cero.\n");
-    shellPrintString("invop   ->   instruccion invalida.\n");
-    shellPrintString("regs    ->   vuelca registros.\n");
+    shellPrintString("help      ->   muestra la lista de comandos.\n");
+    shellPrintString("clear     ->   limpia la pantalla.\n");
+    shellPrintString("printTime ->   imprime la hora actual.\n");
+    shellPrintString("printDate ->   imprime la fecha actual.\n");
+    shellPrintString("registers ->   imprime registros.\n");
+    shellPrintString("testDiv0  ->   division por cero.\n");
+    shellPrintString("invop     ->   instruccion invalida.\n");
 }
 
 void clear(){
     sys_clear();
+}
+
+void divideByZero(){
+    clear();
+    
+    int x = 1;
+    int y = 0;
+    int z;
+    z = x / y;
+}
+
+void registers(){
+    char buffer[REGSBUFF];
+
+    if(sys_registers(buffer)){
+        shellPrintString(buffer);
+    } else{
+        shellPrintString("Presione CTRL para guardar los registros.\n");
+    }
 }
 
 uint8_t adjustHour(uint8_t hour, int offset){

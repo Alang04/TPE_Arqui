@@ -5,6 +5,7 @@
 
 #define STDOUT 1
 #define STDERR 2
+#define REGSBUFF 500
 
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count);
 uint64_t sys_read(char * buff, uint64_t count);
@@ -19,6 +20,8 @@ void processLine(char * buff, uint32_t * history_len);
 
 void help();
 void clear();
+void registers();
+void divideByZero();
 void printTime();
 void printDate();
 uint8_t adjustHour(uint8_t hour, int offset);

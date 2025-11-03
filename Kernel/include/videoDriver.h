@@ -24,8 +24,7 @@ void videoPrint(const char *str, uint32_t color);
 void moveRight();
 void updateCursor();
 int validPosition(uint64_t x,  uint64_t y);
-
-// Extras útiles para el proyecto
+void setTextSize(uint8_t size);
 void clearScreen(uint32_t color);
 void setDefaultTextSize(uint64_t size);
 uint64_t getDefaultTextSize(void);
