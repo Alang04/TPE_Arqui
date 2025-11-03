@@ -1,6 +1,13 @@
 #include <stdint.h>
 
 #define CURSOR '_'
+#define SYSCALL_READ       0
+#define SYSCALL_WRITE      1
+#define SYSCALL_GET_TIME   2
+#define STDIN  0
+#define STDOUT 1
+#define WELCOME "Bienvenido al MASS OS!\n"
+#define BUFF_LENGTH 100
 
 typedef void (*Runnable)(void);
 

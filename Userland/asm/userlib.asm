@@ -9,6 +9,7 @@ GLOBAL sys_increase_fontsize
 GLOBAL sys_decrease_fontsize
 GLOBAL sys_ticks
 GLOBAL sys_beep
+GLOBAL gen_invalid_opcode
 
 section .text
 
@@ -61,3 +62,7 @@ sys_clear:
     mov rax, 9
 	int 0x80
 	ret
+
+gen_invalid_opcode:
+    ud2
+    ret

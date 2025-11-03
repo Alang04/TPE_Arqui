@@ -99,7 +99,8 @@ void handlePressedKey(){
     } else if(scancode == CAPS_LOCK){
         caps = !caps;
     } else if(!(scancode & BREAK_CODE)){
-        writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
+        char c = kbd_manager[(shift + caps) % 2][scancode];
+        writeBuff(c);
     }
 }
 

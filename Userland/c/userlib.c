@@ -10,6 +10,7 @@ static Command commands[] = {
     {"printDate", printDate},
     {"registers", registers},
     {"testDiv0", divideByZero},
+    {"invOp", invOp},
     {"playBeep", playBeep},
     {"bmFPS", bmFPS},
     {"bmCPU", bmCPU},
@@ -20,6 +21,23 @@ static Command commands[] = {
 
 RedrawStruct redrawBuffer[REDRAW_BUFF];
 uint32_t redrawLength = 0;
+void redraw_reset(void){
+    redrawLength = 0;
+}
+
+void redraw_append_char(char c, uint64_t fd){
+    if(redrawLength >= REDRAW_BUFF){
+        // drop oldest
+        for(uint32_t i = 1; i < redrawLength; i++){
+            redrawBuffer[i-1] = redrawBuffer[i];
+        }
+        redrawLength--;
+    }
+    redrawBuffer[redrawLength].character = c;
+    redrawBuffer[redrawLength].fd = fd;
+    redrawLength++;
+}
+
 
 /* Convierte un entero sin signo a cadena en la base indicada.
    - value: número a convertir.
@@ -225,12 +243,46 @@ void bmKEY(){
 
 // Reproduce una secuencia corta de beeps
 void playBeep(){
-    sys_beep(440, 200);
-    sys_beep(0,50);
-    sys_beep(300, 100);
-    sys_beep(0,50);
-    sys_beep(400, 100);
-    sys_beep(0,50);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_DS5, EIGHTH);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_DS5, EIGHTH);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_B4, EIGHTH);
+    sys_beep(NOTE_D5, EIGHTH);
+    sys_beep(NOTE_C5, EIGHTH);
+    sys_beep(NOTE_A4, QUARTER);
+
+    sys_beep(NOTE_C4, EIGHTH);
+    sys_beep(NOTE_E4, EIGHTH);
+    sys_beep(NOTE_A4, EIGHTH);
+    sys_beep(NOTE_B4, QUARTER);
+
+    sys_beep(NOTE_E4, EIGHTH);
+    sys_beep(NOTE_GS4, EIGHTH);
+    sys_beep(NOTE_B4, EIGHTH);
+    sys_beep(NOTE_C5, QUARTER);
+
+    sys_beep(NOTE_E4, EIGHTH);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_DS5, EIGHTH);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_DS5, EIGHTH);
+    sys_beep(NOTE_E5, EIGHTH);
+    sys_beep(NOTE_B4, EIGHTH);
+    sys_beep(NOTE_D5, EIGHTH);
+    sys_beep(NOTE_C5, EIGHTH);
+    sys_beep(NOTE_A4, QUARTER);
+
+    sys_beep(NOTE_C4, EIGHTH);
+    sys_beep(NOTE_E4, EIGHTH);
+    sys_beep(NOTE_A4, EIGHTH);
+    sys_beep(NOTE_B4, QUARTER);
+
+    sys_beep(NOTE_E4, EIGHTH);
+    sys_beep(NOTE_C5, EIGHTH);
+    sys_beep(NOTE_B4, EIGHTH);
+    sys_beep(NOTE_A4, QUARTER);
 }
 
 // Redibuja la pantalla luego de cambiar el tamaño de fuente
@@ -283,8 +335,10 @@ void help(){
     shellPrintString("printDate ->   imprime la fecha actual.\n");
     shellPrintString("registers ->   imprime registros.\n");
     shellPrintString("testDiv0  ->   division por cero.\n");
-    shellPrintString("invOp     ->   instruccion invalida.\n");  /* falta hacer */
+    shellPrintString("invOp     ->   instruccion invalida.\n");
     shellPrintString("playBeep  ->   reproduce un beep.\n");
+    shellPrintString("+         ->   aumenta tamaño de fuente.\n");
+    shellPrintString("-         ->   disminuye tamaño de fuente.\n");
     shellPrintString("bmFPS     ->   benchmark de FPS.\n");
     shellPrintString("bmCPU     ->   benchmark de CPU.\n");
     shellPrintString("bmMEM     ->   benchmark de MEM.\n");
@@ -293,17 +347,21 @@ void help(){
 // Limpia la pantalla
 void clear(){
     sys_clear();
+    redraw_reset();
 }
 
 // Provoca excepción de división por cero
 void divideByZero(){
     clear();
-    
     int x = 1;
     int y = 0;
     int z;
     z = x / y; // dispara #DE
     (void)z;   // evitar warning de variable no usada (si no se dispara la excepción)
+}
+
+void invOp(){
+    gen_invalid_opcode();
 }
 
 // Imprime el snapshot de registros (CTRL para capturar)
@@ -432,7 +490,7 @@ int strcmp(const char *a, const char *b){
 uint64_t putchar(char c){
     char buff[1];
     buff[0] = c;
-
+    redraw_append_char(c, STDOUT);
     return sys_write(STDOUT, buff, 1);
 }
 

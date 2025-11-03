@@ -19,14 +19,6 @@ static void hideCursor(){
     }
 }
 
-#define SYSCALL_READ       0
-#define SYSCALL_WRITE      1
-#define SYSCALL_GET_TIME   2
-#define STDIN  0
-#define STDOUT 1
-#define WELCOME "Bienvenido al MASS OS!\n"
-#define BUFF_LENGTH 100
-
 // Bucle principal de la shell de usuario
 int main(){
     shellPrintString(WELCOME);
@@ -70,6 +62,18 @@ void shellReadLine(char * buffer, uint64_t max){
                     shellPutchar('\b', STDOUT); // borrar último carácter
                     showCursor();           // volver a dibujar cursor
                 }
+            } else if(c == '+'){
+                // Aumentar fuente y redibujar contenido
+                hideCursor();
+                sys_increase_fontsize();
+                redrawFont();
+                showCursor();
+            } else if(c == '-'){
+                // Disminuir fuente y redibujar contenido
+                hideCursor();
+                sys_decrease_fontsize();
+                redrawFont();
+                showCursor();
             } else {
                 if(idx + 1 < max){ // dejar lugar para terminador NUL
                     buffer[idx++] = c;
@@ -110,11 +114,10 @@ void shellPrintString(char *str){
 
 // Escribe un caracter en el descriptor indicado
 void shellPutchar(char c, uint64_t fd){
-    //char backspace = '\b';
-    //char cursor = CURSOR;
-    //sys_write(STDOUT, &backspace, 1); // borro el cursor
+    // Registrar en redraw buffer antes de imprimir
+    extern void redraw_append_char(char, uint64_t);
+    redraw_append_char(c, fd);
     sys_write(fd, &c, 1); // escribo el caracter
-    //sys_write(STDOUT, &cursor, 1); // escribo el cursor
 }
 
 // Salto de línea

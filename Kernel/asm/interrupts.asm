@@ -77,6 +77,51 @@ SECTION .text
 
 %macro exceptionHandler 1
 	pushState
+
+	; Guardar snapshot de registros en una excepción
+	; Layout tras pushState: [r15..rax] luego frame de hardware (RIP,CS,RFLAGS,RSP,SS)
+	mov     rax, [rsp + 14*8]   ; RAX original
+	mov     [regsArray + 0*8], rax
+	mov     rax, [rsp + 13*8]   ; RBX
+	mov     [regsArray + 1*8], rax
+	mov     rax, [rsp + 12*8]   ; RCX
+	mov     [regsArray + 2*8], rax
+	mov     rax, [rsp + 11*8]   ; RDX
+	mov     [regsArray + 3*8], rax
+	mov     rax, [rsp + 10*8]   ; RBP
+	mov     [regsArray + 4*8], rax
+	mov     rax, [rsp + 9*8]    ; RDI
+	mov     [regsArray + 5*8], rax
+	mov     rax, [rsp + 8*8]    ; RSI
+	mov     [regsArray + 6*8], rax
+	mov     rax, [rsp + 7*8]    ; R8
+	mov     [regsArray + 7*8], rax
+	mov     rax, [rsp + 6*8]    ; R9
+	mov     [regsArray + 8*8], rax
+	mov     rax, [rsp + 5*8]    ; R10
+	mov     [regsArray + 9*8], rax
+	mov     rax, [rsp + 4*8]    ; R11
+	mov     [regsArray + 10*8], rax
+	mov     rax, [rsp + 3*8]    ; R12
+	mov     [regsArray + 11*8], rax
+	mov     rax, [rsp + 2*8]    ; R13
+	mov     [regsArray + 12*8], rax
+	mov     rax, [rsp + 1*8]    ; R14
+	mov     [regsArray + 13*8], rax
+	mov     rax, [rsp + 0*8]    ; R15
+	mov     [regsArray + 14*8], rax
+
+	; Frame de hardware
+	mov     rax, [rsp + 15*8]   ; RIP
+	mov     [regsArray + 15*8], rax
+	mov     rax, [rsp + 16*8]   ; CS
+	mov     [regsArray + 16*8], rax
+	mov     rax, [rsp + 17*8]   ; RFLAGS
+	mov     [regsArray + 17*8], rax
+	mov     rax, [rsp + 18*8]   ; RSP (si aplica)
+	mov     [regsArray + 18*8], rax
+	mov     rax, [rsp + 19*8]   ; SS (si aplica)
+	mov     [regsArray + 19*8], rax
 	mov rdi, %1 
 	mov rsi, rsp
 	call exceptionDispatcher
