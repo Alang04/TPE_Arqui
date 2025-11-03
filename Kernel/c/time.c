@@ -9,6 +9,20 @@ unsigned char getYear();
 
 static unsigned long ticks = 0;
 
+void sleep(int ms){
+	unsigned long start = ticks;
+
+	unsigned long target = ms / 10;
+
+	while((ticks - start) < target){
+		_hlt();
+	}
+}
+
+unsigned long deltaTicks(){
+	return ticks;
+}
+
 void date(unsigned char *buff){
 	buff[0] = getDayOfMonth();
 	buff[1] = getMonth();

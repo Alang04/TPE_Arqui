@@ -14,7 +14,6 @@ GLOBAL _irq128Handler
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
-GLOBAL getSyscallIntRoutineAddr
 GLOBAL pressed_key
 GLOBAL regsArray
 EXTERN irqDispatcher

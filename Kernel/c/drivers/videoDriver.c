@@ -71,6 +71,21 @@ int validPosition(uint64_t x,  uint64_t y){
 
 /* FUNCIONES DEMODO TEXTO. */
 
+void increaseFontSize(){
+    if (defaultTextSize < MAX_FONT_SIZE){
+        defaultTextSize++;
+    }
+
+    updateCursor();
+}
+
+void decreaseFontSize(){
+    if(defaultTextSize > 1){
+        defaultTextSize--;
+    }
+    updateCursor();
+}
+
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
     if(!validPosition(x, y)){
         return;

@@ -17,7 +17,7 @@
 
 #define MIN_CHAR 0
 #define MAX_CHAR 256
-#define CANT_SYS 5
+#define CANT_SYS 9
 #define STDOUT 1
 #define STDERR 2
 #define TEXT_SIZE 1
@@ -40,5 +40,6 @@
 #define L_CONTROL 0x1D
 #define LETTERS 26
 #define BACKSPACE 0x0E
+#define MAX_FONT_SIZE 5
 
 #endif

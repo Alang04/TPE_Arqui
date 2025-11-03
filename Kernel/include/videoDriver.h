@@ -27,6 +27,8 @@ int validPosition(uint64_t x,  uint64_t y);
 void setTextSize(uint8_t size);
 void clearScreen(uint32_t color);
 void setDefaultTextSize(uint64_t size);
-uint64_t getDefaultTextSize(void);
+uint64_t getDefaultTextSize();
+void increaseFontSize();
+void decreaseFontSize();
 
 #endif

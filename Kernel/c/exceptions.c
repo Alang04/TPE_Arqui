@@ -40,6 +40,4 @@ void excepHandler(char * msg){
 	do{
 		_hlt();
 	}while((c = getFromBuffer()) != '\n');
-
-	clearScreen(0x000000);
 }
