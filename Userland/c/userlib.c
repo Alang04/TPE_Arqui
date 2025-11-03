@@ -117,7 +117,7 @@ void bmFPS(){
 
     shellPrintString("Inicio de test.\n");
     /* busy loop that only clears the screen and increments counter */
-    while(sys_ticks() - (ticks < duration)){
+    while((sys_ticks() - ticks) < duration){
         sys_clear();
         count++;
     }
@@ -290,7 +290,8 @@ void divideByZero(){
     int x = 1;
     int y = 0;
     int z;
-    z = x / y;
+    z = x / y; // dispara #DE
+    (void)z;   // evitar warning de variable no usada (si no se dispara la excepción)
 }
 
 void registers(){

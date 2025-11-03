@@ -1,34 +1,36 @@
 #include "../include/exceptions.h"
 #include "../include/videoDriver.h"
 #include "../include/keyboardDriver.h"
+#include "../include/interrupts.h"
 
-#define ZERO_EXCEPTION_ID 0
-#define INVALID_OPCODE_ID 6
-
-Exception exceptionsArray[] = {&zeroDivision, 
-	0, 0, 0, 0, 0, &invalidOpcode};
+Exception exceptionsArray[] = 
+	{&zeroDivision, 
+	0, 
+	0, 
+	0, 
+	0, 
+	0, 
+	&invalidOpcode};
 
 char * exceptionMessage[] = { "zeroDivision Exception!", "invalidOpcode Exception!"};
 
 void zeroDivision(){
-	excepHandler(exceptionMessage[0]);
+	exceptionHandler(exceptionMessage[0]);
 }
 
 void invalidOpcode(){
-	excepHandler(exceptionMessage[1]);
+	exceptionHandler(exceptionMessage[1]);
 }
 
 void exceptionDispatcher(int exception){
-	if (exception == ZERO_EXCEPTION_ID){
-		zeroDivision();
-	} else{
-		if(exception == INVALID_OPCODE_ID){
-			invalidOpcode();
-		}
+	Exception ex = exceptionsArray[exception];
+
+	if(ex != 0){
+		ex();
 	}
 }
 
-void excepHandler(char * msg){
+void exceptionHandler(char * msg){
 	newLine();
 	videoPrint(msg, 0xFFFFFF);
 	newLine();

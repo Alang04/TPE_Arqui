@@ -15,5 +15,6 @@ void sys_decrease_fontsize();
 void sys_increase_fontsize();
 void sys_beep(uint32_t freq, uint64_t time);
 uint64_t sys_ticks();
+void sys_clear();
 
 #endif

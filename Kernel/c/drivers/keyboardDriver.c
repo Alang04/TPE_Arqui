@@ -25,7 +25,7 @@ char kbd_mayus[KBD_LENGTH] = {
 };
 
 char * kbd_manager[] = {kbd_min, kbd_mayus};
-static uint8_t pressedKeys[LETTERS] = {0};
+static __attribute__((unused)) uint8_t pressedKeys[LETTERS] = {0};
 
 static char buff[BUFF_LENGTH];
 static char registersBuff[REGISTERS_BUFFER_SIZE];
@@ -35,6 +35,9 @@ int buff_size = 0;
 int start_index = 0;
 int end_index = 0;
 int boolRegisters = 0;
+
+// Forward declaration to avoid implicit declaration warning
+void storeSnapshot(void);
 
 void writeBuff(unsigned char c){
     buff[end_index] = c;
@@ -76,15 +79,6 @@ uint64_t readKeyBuff(char * buff, uint64_t count){
 void handlePressedKey(){
     uint8_t scancode = pressed_key;
     pressed_key = 0;
-
-    if(scancode == BACKSPACE){
-        if(buff_size == 0){
-            return;
-        }
-        end_index = (end_index - 1 + BUFF_LENGTH) % BUFF_LENGTH;
-        buff_size--;
-        return;
-    }
     if(scancode == L_ARROW || scancode == R_ARROW || scancode == UP_ARROW || scancode == DOWN_ARROW || scancode == 0 || scancode > BREAK_CODE){
         return;
     } else if(scancode == L_SHIFT || scancode == R_SHIFT){
@@ -99,7 +93,7 @@ void handlePressedKey(){
     } else if(scancode == CAPS_LOCK){
         caps = !caps;
     } else if(!(scancode & BREAK_CODE)){
-        writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
+         writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
     }
 }
 

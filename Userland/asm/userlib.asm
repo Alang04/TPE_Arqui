@@ -57,6 +57,6 @@ sys_ticks:
     ret
 
 sys_clear:
-    mov rax, 13
+    mov rax, 9
 	int 0x80
 	ret

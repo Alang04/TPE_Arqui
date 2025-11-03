@@ -104,7 +104,7 @@ void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
 
 void scroll(){
     uint64_t lineHeight = defaultTextSize * FONT_HEIGHT;
-    uint8_t * framebuffer = (uint8_t *) vbe_mode_info->framebuffer;
+    uint8_t * framebuffer = (uint8_t *)(uintptr_t) vbe_mode_info->framebuffer;
     
     for(uint64_t srcY = lineHeight; srcY < vbe_mode_info->height; srcY++){
         uint64_t dstY = srcY - lineHeight;
@@ -323,5 +323,8 @@ void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
 }
 
 void clearScreen(uint32_t color){
+    // Clear the screen and reset cursor to top-left
     drawFilledRect(0, 0, vbe_mode_info->width, vbe_mode_info->height, color);
+    currentX = 0;
+    currentY = 0;
 }

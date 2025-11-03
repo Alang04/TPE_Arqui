@@ -13,6 +13,11 @@ void sys_decrease_fontsize(){
     decreaseFontSize();
 }
 
+// Clears the graphical screen to black
+void sys_clear(){
+    clearScreen(0x000000);
+}
+
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
     uint32_t color = 0xFFFFFF;
 
@@ -47,4 +52,15 @@ uint64_t sys_ticks(){
     return deltaTicks();
 }
 
-void * syscalls[CANT_SYS] = {&sys_registers, &sys_time, &sys_date, &sys_read, &sys_write, &sys_increase_fontsize, &sys_decrease_fontsize, &sys_beep, &sys_ticks};
+void * syscalls[CANT_SYS] = {
+    &sys_registers,         // 0
+    &sys_time,              // 1
+    &sys_date,              // 2
+    &sys_read,              // 3
+    &sys_write,             // 4
+    &sys_increase_fontsize, // 5
+    &sys_decrease_fontsize, // 6
+    &sys_beep,              // 7
+    &sys_ticks,             // 8
+    &sys_clear              // 9
+};
