@@ -39,6 +39,7 @@ int boolRegisters = 0;
 // Forward declaration to avoid implicit declaration warning
 void storeSnapshot(void);
 
+// Inserta un caracter en el buffer circular de teclado
 void writeBuff(unsigned char c){
     buff[end_index] = c;
     end_index = (end_index + 1) % BUFF_LENGTH;
@@ -49,12 +50,14 @@ void writeBuff(unsigned char c){
     }
 }
 
+// Reinicia el buffer de teclado
 void clearBuff(){
     buff_size = 0;
     start_index = 0;
     end_index = 0;
 }
 
+// Extrae un byte del buffer; -1 si vacío
 uint8_t getFromBuffer(){
     if(buff_size == 0){
         return (uint8_t) - 1;
@@ -67,6 +70,7 @@ uint8_t getFromBuffer(){
     return result;
 }
 
+// Copia hasta 'count' bytes disponibles del buffer de teclado
 uint64_t readKeyBuff(char * buff, uint64_t count){
     int i;
     for(i = 0; i < count && i < buff_size; i++){
@@ -76,15 +80,17 @@ uint64_t readKeyBuff(char * buff, uint64_t count){
     return i;
 }
 
+// Traduce el scancode leído por la ISR y lo almacena en el buffer
 void handlePressedKey(){
     uint8_t scancode = pressed_key;
     pressed_key = 0;
-    if(scancode == L_ARROW || scancode == R_ARROW || scancode == UP_ARROW || scancode == DOWN_ARROW || scancode == 0 || scancode > BREAK_CODE){
-        return;
-    } else if(scancode == L_SHIFT || scancode == R_SHIFT){
+
+    if(scancode == L_SHIFT || scancode == R_SHIFT){
         shift = 1;
     } else if(scancode == (L_SHIFT | BREAK_CODE) || scancode == (R_SHIFT | BREAK_CODE)){
         shift = 0;
+    }else if(scancode == L_ARROW || scancode == R_ARROW || scancode == UP_ARROW || scancode == DOWN_ARROW || scancode == 0 || scancode > BREAK_CODE){
+        return;
     } else if(scancode == L_CONTROL){
         //ARREGLAR PROBLEMA DE CTRL NO GUARDA REGISTROS SOLO CLEAR?
         storeSnapshot();
@@ -93,10 +99,11 @@ void handlePressedKey(){
     } else if(scancode == CAPS_LOCK){
         caps = !caps;
     } else if(!(scancode & BREAK_CODE)){
-         writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
+        writeBuff(kbd_manager[(shift + caps) % 2][scancode]);
     }
 }
 
+// Copia el snapshot de registros a 'buff' si está disponible
 uint64_t copyRegistersBuffer(char * buff){
     if(boolRegisters){
         int i;
@@ -111,6 +118,7 @@ uint64_t copyRegistersBuffer(char * buff){
     return 0;
 }
 
+// Serializa los registros guardados por la ISR en formato legible
 void storeSnapshot(){
     char * regs[] = {"RAX: 0x", "RBX: 0x", "RCX: 0x", "RDX: 0x", "RBP: 0x", "RDI: 0x", "RSI: 0x",  
      "R8: 0x", "R9: 0x", "R10: 0x", "R11: 0x", "R12: 0x", "R13: 0x", "R14: 0x", "R15: 0x", "RIP: 0x", "CS: 0x", "RFLAGS: 0x", "RSP: 0x", "SS: 0x", 0};

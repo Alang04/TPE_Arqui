@@ -6,19 +6,20 @@ int main();
 
 void * memset(void * destiny, int32_t c, uint64_t length);
 
+// Entry de módulo de usuario: limpia BSS y salta a main
 int _start(){
 	memset(&bss, 0, &endOfBinary - &bss);
 	return main();
 }
 
-
-void * memset(void * destiation, int32_t c, uint64_t length){
+// Implementación local de memset para entorno freestanding
+void * memset(void * destination, int32_t c, uint64_t length){
 	uint8_t chr = (uint8_t)c;
-	char * dst = (char*)destiation;
+	char * dst = (char*)destination;
 
 	while(length--){
 		dst[length] = chr;
 	}
 
-	return destiation;
+	return destination;
 }

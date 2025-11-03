@@ -1,3 +1,4 @@
+; Wrappers de syscalls (int 0x80) - ver índices en Kernel/c/syscallDispatcher.c
 GLOBAL sys_write
 GLOBAL sys_read
 GLOBAL sys_registers

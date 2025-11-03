@@ -48,10 +48,12 @@ static const int bgColor = 0x000000;   // Negro
 static uint64_t defaultTextSize = TEXT_SIZE; // Tamaño por defecto (ajustable)
 
 // API utilitaria
+// Ancho en píxeles del modo actual
 uint16_t getScreenWidth(){ 
     return vbe_mode_info->width;
 }
 
+// Alto en píxeles del modo actual
 uint16_t getScreenHeight(){
     return vbe_mode_info->height;
 }
@@ -86,6 +88,7 @@ void decreaseFontSize(){
     updateCursor();
 }
 
+// Dibuja un pixel validando límites y BPP
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
     if(!validPosition(x, y)){
         return;
@@ -102,6 +105,7 @@ void putPixel(uint32_t hexColor, uint64_t x, uint64_t y){
     }
 }
 
+// Desplaza la pantalla una línea hacia arriba
 void scroll(){
     uint64_t lineHeight = defaultTextSize * FONT_HEIGHT;
     uint8_t * framebuffer = (uint8_t *)(uintptr_t) vbe_mode_info->framebuffer;
@@ -118,6 +122,7 @@ void scroll(){
     fillRectangle(0, lastLineStart, vbe_mode_info->width, vbe_mode_info->height, bgColor);
 }
 
+// Salta a la línea siguiente con scroll automático
 void newLine(){
     currentX = 0;
 
@@ -135,6 +140,7 @@ void newLine(){
     }
 }
 
+// Imprime un carácter en modo gráfico con soporte para \n y \b
 void videoPutChar(uint8_t c, uint32_t color){
     if(c == '\n' || c == '\r'){ 
         newLine();
@@ -158,6 +164,7 @@ void videoPutChar(uint8_t c, uint32_t color){
     updateCursor();
 }
 
+// Imprime una cadena completa en color
 void videoPrint(const char *str, uint32_t color){
     if(str == 0){
         return;
@@ -168,6 +175,7 @@ void videoPrint(const char *str, uint32_t color){
     }
 }
 
+// Avanza el cursor horizontalmente con wrap
 void moveRight(){
     uint64_t stepX = (uint64_t)FONT_WIDTH * defaultTextSize;
     if(currentX + stepX < vbe_mode_info->width){
@@ -177,12 +185,14 @@ void moveRight(){
     }
 }
 
+// Asegura que el cursor esté en una posición válida
 void updateCursor(){
     if(!validPosition(currentX + (uint64_t)FONT_WIDTH * defaultTextSize - 1, currentY + (uint64_t)FONT_HEIGHT * defaultTextSize - 1)){
         newLine();
     }
 }
 
+// Imprime una cadena en (x,y) con tamaño escalado
 void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size){
     if(str == 0){
         return;
@@ -208,6 +218,7 @@ int abs(int x){
     return (x < 0) ? (-x) : (x);
 }
 
+// Línea con algoritmo de Bresenham
 void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color){
     int64_t ix0 = (int64_t)x0, iy0 = (int64_t)y0, ix1 = (int64_t)x1, iy1 = (int64_t)y1;
     int64_t dx = abs((int)(ix1 - ix0));
@@ -235,6 +246,7 @@ void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color
     }
 }
 
+// Rellena un rectángulo [x0,y0) x [x1,y1)
 void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
     if (x1 <= x0 || y1 <= y0){
         return;
@@ -265,6 +277,7 @@ void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t 
     }
 }
 
+// Dibuja el contorno de un rectángulo
 void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
     // Normaliza coordenadas
     if(x1 < x0){ 
@@ -282,10 +295,12 @@ void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t 
     drawLine(x0, y1, x0, y0, color);
 }
 
+// Rellena un rectángulo usando ancho/alto
 void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color){
     fillRectangle(x, y, (uint64_t)x + width, (uint64_t)y + height, color);
 }
 
+// Dibuja una cadena en (x,y) tamaño escalado
 void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size){
     if (str == 0){
         return;
@@ -296,6 +311,7 @@ void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_
     }
 }
 
+// Dibuja un carácter usando la bitmap de la fuente
 void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
     if (c >= 128){
         return;
@@ -322,6 +338,7 @@ void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
     }
 }
 
+// Limpia toda la pantalla y resetea el cursor
 void clearScreen(uint32_t color){
     // Clear the screen and reset cursor to top-left
     drawFilledRect(0, 0, vbe_mode_info->width, vbe_mode_info->height, color);

@@ -27,6 +27,7 @@ uint32_t redrawLength = 0;
    - base: base entre 2 y 16 (por ejemplo 10 para decimal, 16 para hex).
    Retorna la cantidad de caracteres escritos (sin incluir el '\0').
 */
+// Convierte entero sin signo a string en base [2..16]
 uint64_t num_to_str(uint64_t value, char * dest, int base){
     if(!dest) return 0;
     if(base < 2 || base > 16) base = 10;
@@ -52,6 +53,7 @@ uint64_t num_to_str(uint64_t value, char * dest, int base){
     return (uint64_t)pos;
 }
 
+// Benchmark de CPU (operaciones int/float)
 void bmCPU(){
     /*
      * bmCPU - simple CPU benchmark
@@ -103,6 +105,7 @@ void bmCPU(){
     return;
 }
 
+// Benchmark de FPS aproximado (limpia pantalla en loop)
 void bmFPS(){    
     /*
      * bmFPS - crude frame-rate benchmark
@@ -132,6 +135,7 @@ void bmFPS(){
     shellPrintString("\n");
 }
 
+// Benchmark simple de memoria (llenado/copia/checksum)
 void bmMEM(){
     /*
      * bmMEM - simple memory benchmark
@@ -203,6 +207,7 @@ void bmMEM(){
     }
 }
 
+// Mide tiempo hasta presionar una tecla
 void bmKEY(){
     shellPrintString("Presione cualquier tecla: \n");
     uint64_t ticks = sys_ticks();
@@ -218,6 +223,7 @@ void bmKEY(){
     shellPrintString(" ticks\n");
 }
 
+// Reproduce una secuencia corta de beeps
 void playBeep(){
     sys_beep(440, 200);
     sys_beep(0,50);
@@ -227,6 +233,7 @@ void playBeep(){
     sys_beep(0,50);
 }
 
+// Redibuja la pantalla luego de cambiar el tamaño de fuente
 void redrawFont(){
     sys_clear(); 
 
@@ -255,16 +262,19 @@ void redrawFont(){
     }
 }
 
+// Aumenta tamaño de fuente y refresca contenido
 void shellIncreaseFontSize(){
     sys_increase_fontsize(); 
     redrawFont();
 }
 
+// Disminuye tamaño de fuente y refresca contenido
 void shellDecreaseFontSize(){ 
     sys_decrease_fontsize(); 
     redrawFont();
 }
 
+// Lista de comandos disponibles
 void help(){
     shellPrintString("Comandos disponibles: \n");
     shellPrintString("help      ->   muestra la lista de comandos.\n");
@@ -280,10 +290,12 @@ void help(){
     shellPrintString("bmMEM     ->   benchmark de MEM.\n");
     shellPrintString("bmKEY     ->   benchmark de teclado.\n");
 }
+// Limpia la pantalla
 void clear(){
     sys_clear();
 }
 
+// Provoca excepción de división por cero
 void divideByZero(){
     clear();
     
@@ -294,6 +306,7 @@ void divideByZero(){
     (void)z;   // evitar warning de variable no usada (si no se dispara la excepción)
 }
 
+// Imprime el snapshot de registros (CTRL para capturar)
 void registers(){
     char buffer[REGSBUFF];
 
@@ -304,6 +317,7 @@ void registers(){
     }
 }
 
+// Ajusta hora BCD por offset (0-23)
 uint8_t adjustHour(uint8_t hour, int offset){
     int decimalHour = ((hour >> 4) * 10) + (hour & 0x0F);
     decimalHour += offset;
@@ -320,6 +334,7 @@ uint8_t adjustHour(uint8_t hour, int offset){
      return ((decimalHour / 10) << 4) | (decimalHour % 10);
 }
 
+// Imprime HH:MM:SS o DD/MM/AA desde buffer BCD
 void printTimeAndDate(uint8_t* buff, char separator){
     char outBuff[10];
 
@@ -339,6 +354,7 @@ void printTimeAndDate(uint8_t* buff, char separator){
     shellPrintString(outBuff);
 }
 
+// Imprime hora local (UTC-3)
 void printTime(){
     uint8_t timeBuff[3];
     sys_time(timeBuff);
@@ -346,6 +362,7 @@ void printTime(){
     printTimeAndDate(timeBuff, ':');
 }
 
+// Imprime fecha local considerando rollover por UTC-3
 void printDate(){
     uint8_t timeBuff[3];
     uint8_t dateBuff[3];
@@ -381,6 +398,7 @@ void printDate(){
 }
 
 // Implementaciones mínimas de string para entorno freestanding
+// strlen mínimo para entorno freestanding
 size_t strlen(const char *s){
     size_t n = 0;
     if(s == 0) return 0;
@@ -388,6 +406,7 @@ size_t strlen(const char *s){
     return n;
 }
 
+// strcmp mínimo para entorno freestanding
 int strcmp(const char *a, const char *b){
     if(a == 0 && b == 0){
           return 0;
@@ -409,6 +428,7 @@ int strcmp(const char *a, const char *b){
     return (unsigned char)*a - (unsigned char)*b;
 }
 
+// putchar usando sys_write
 uint64_t putchar(char c){
     char buff[1];
     buff[0] = c;
@@ -416,6 +436,7 @@ uint64_t putchar(char c){
     return sys_write(STDOUT, buff, 1);
 }
 
+// getchar bloqueante (espera hasta recibir 1 byte)
 char getchar(){
     char c;
     while(sys_read(&c, 1) == 0)
@@ -423,6 +444,7 @@ char getchar(){
     return c;
 }
 
+// Busca y ejecuta el comando ingresado
 void processLine(char * buff, uint32_t * history_len){
     if(strlen(buff) == 0){
         return;

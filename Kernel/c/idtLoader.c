@@ -25,6 +25,7 @@ static DESCR_INT idt[256] = {0};
 
 static void setup_IDT_entry (int index, uint64_t offset);
 
+// Inicializa la IDT con handlers básicos y habilita interrupciones
 void load_idt(){
   // Set a few handlers
   setup_IDT_entry(0x20, (uint64_t)&_irq00Handler);   // Timer
@@ -46,6 +47,7 @@ void load_idt(){
   _sti();
 }
 
+// Configura una entrada de la IDT en modo 64 bits (interrupt gate)
 static void setup_IDT_entry (int index, uint64_t offset){
   idt[index].selector = 0x08;
   idt[index].offset_l = offset & 0xFFFF;

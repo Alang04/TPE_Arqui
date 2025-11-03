@@ -123,49 +123,73 @@ _irq00Handler:
 	irqHandlerMaster 0
 
 ;Keyboard
+; IRQ1 - Teclado: captura scancode y opcionalmente snapshot de registros.
 _irq01Handler:
-	push rax
-	xor 	rax, rax
-	in 	al, 0x60 ; guardo la tecla
-	mov 	[pressed_key], rax
-	cmp 	rax, SNAPSHOT_KEY
-	jne 	.doNotCapture
+	; Guardar contexto completo al entrar (para snapshot correcto)
+	pushState
 
-	pop 	rax
-	mov 	rax, 15
-	mov 	r8, 10
-	mov 	[regsArray + 0 * 8],  rax
-	mov 	[regsArray + 1 * 8],  rbx
-	mov 	[regsArray + 2 * 8],  rcx
-	mov 	[regsArray + 3 * 8],  rdx
-	mov 	[regsArray + 4 * 8],  rbp
-	mov 	[regsArray + 5 * 8],  rdi
-	mov 	[regsArray + 6 * 8],  rsi
-	mov 	[regsArray + 7 * 8],  r8
-	mov 	[regsArray + 8 * 8],  r9
-	mov 	[regsArray + 9 * 8],  r10
-	mov 	[regsArray + 10 * 8], r11
-	mov 	[regsArray + 11 * 8], r12
-	mov 	[regsArray + 12 * 8], r13
-	mov 	[regsArray + 13 * 8], r14
-	mov 	[regsArray + 14 * 8], r15
-	mov 	rax, [rsp + 8 * 0] ; rip
-	mov 	[regsArray + 15 * 8], rax
-	mov 	rax, [rsp + 8 * 1] ; cs
-	mov 	[regsArray + 16 * 8], rax
-	mov 	rax, [rsp + 8 * 2] ; rflags
-	mov 	[regsArray + 17 * 8], rax
-	mov 	rax, [rsp + 8 * 3] ; rsp
-	mov 	[regsArray + 18 * 8], rax
-	mov 	rax, [rsp + 8 * 4] ; ss
-	mov 	[regsArray + 19 * 8], rax
-	jmp 	.continue
+	; Leer scancode y exponerlo a C
+	xor     eax, eax
+	in      al, 0x60
+	mov     [pressed_key], rax
 
-.doNotCapture:
-	pop rax
+	; Si es la tecla de snapshot (CTRL), copiar contexto salvado
+	cmp     al, SNAPSHOT_KEY
+	jne     .no_snapshot
 
-.continue:
-	irqHandlerMaster 1
+	; Layout tras pushState (desde [rsp]):
+	;  r15, r14, ..., rax (15 regs) | RIP, CS, RFLAGS, RSP, SS
+	mov     rax, [rsp + 14*8]   ; RAX original
+	mov     [regsArray + 0*8], rax
+	mov     rax, [rsp + 13*8]   ; RBX
+	mov     [regsArray + 1*8], rax
+	mov     rax, [rsp + 12*8]   ; RCX
+	mov     [regsArray + 2*8], rax
+	mov     rax, [rsp + 11*8]   ; RDX
+	mov     [regsArray + 3*8], rax
+	mov     rax, [rsp + 10*8]   ; RBP
+	mov     [regsArray + 4*8], rax
+	mov     rax, [rsp + 9*8]    ; RDI
+	mov     [regsArray + 5*8], rax
+	mov     rax, [rsp + 8*8]    ; RSI
+	mov     [regsArray + 6*8], rax
+	mov     rax, [rsp + 7*8]    ; R8
+	mov     [regsArray + 7*8], rax
+	mov     rax, [rsp + 6*8]    ; R9
+	mov     [regsArray + 8*8], rax
+	mov     rax, [rsp + 5*8]    ; R10
+	mov     [regsArray + 9*8], rax
+	mov     rax, [rsp + 4*8]    ; R11
+	mov     [regsArray + 10*8], rax
+	mov     rax, [rsp + 3*8]    ; R12
+	mov     [regsArray + 11*8], rax
+	mov     rax, [rsp + 2*8]    ; R13
+	mov     [regsArray + 12*8], rax
+	mov     rax, [rsp + 1*8]    ; R14
+	mov     [regsArray + 13*8], rax
+	mov     rax, [rsp + 0*8]    ; R15
+	mov     [regsArray + 14*8], rax
+
+	; Frame de hardware
+	mov     rax, [rsp + 15*8]   ; RIP
+	mov     [regsArray + 15*8], rax
+	mov     rax, [rsp + 16*8]   ; CS
+	mov     [regsArray + 16*8], rax
+	mov     rax, [rsp + 17*8]   ; RFLAGS
+	mov     [regsArray + 17*8], rax
+	mov     rax, [rsp + 18*8]   ; RSP
+	mov     [regsArray + 18*8], rax
+	mov     rax, [rsp + 19*8]   ; SS
+	mov     [regsArray + 19*8], rax
+
+.no_snapshot:
+	; Despachar IRQ teclado
+	mov     rdi, 1
+	call    irqDispatcher
+	mov     al, 20h
+	out     20h, al
+	popState
+	iretq
 
 ;Cascade pic never called
 _irq02Handler:
@@ -193,7 +217,7 @@ _exception6Handler:
 
 _irq128Handler:
     pushState
-    cmp rax, 23
+	cmp rax, 10 ; validar índice de syscall (CANT_SYS)
     jge .syscall_end
     call [syscalls + rax * 8]
 

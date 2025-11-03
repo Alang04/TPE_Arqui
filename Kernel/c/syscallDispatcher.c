@@ -6,6 +6,7 @@
 #include "time.h"
 #include "sound.h"
 
+// Aumenta el tamaño de fuente por defecto
 void sys_increase_fontsize(){
     increaseFontSize();
 }
@@ -13,11 +14,12 @@ void sys_decrease_fontsize(){
     decreaseFontSize();
 }
 
-// Clears the graphical screen to black
+// Limpia la pantalla en modo gráfico (negro)
 void sys_clear(){
     clearScreen(0x000000);
 }
 
+// Escribe 'count' bytes en la salida indicada (texto gráfico)
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
     uint32_t color = 0xFFFFFF;
 
@@ -28,6 +30,7 @@ uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
     return count;
 }
 
+// Lee hasta 'count' bytes del buffer de teclado (no bloqueante)
 uint64_t sys_read(char * buff, uint64_t count){
    return readKeyBuff(buff, count);
 }
@@ -48,6 +51,7 @@ void sys_beep(uint32_t freq, uint64_t time){
     beep(freq, time);
 }
 
+// Retorna el contador de ticks desde el arranque
 uint64_t sys_ticks(){
     return deltaTicks();
 }

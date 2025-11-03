@@ -27,6 +27,7 @@ static void hideCursor(){
 #define WELCOME "Bienvenido al MASS OS!\n"
 #define BUFF_LENGTH 100
 
+// Bucle principal de la shell de usuario
 int main(){
     shellPrintString(WELCOME);
     shellNewline();
@@ -45,6 +46,7 @@ int main(){
     return 0;
 }
 
+// Lee una línea desde teclado con cursor parpadeante
 void shellReadLine(char * buffer, uint64_t max){
     char c;
     uint32_t idx = 0;
@@ -96,6 +98,7 @@ void shellReadLine(char * buffer, uint64_t max){
     buffer[idx] = 0;
 }
 
+// Imprime una cadena en STDOUT
 void shellPrintString(char *str){
     if(str == 0){
         return;
@@ -105,6 +108,7 @@ void shellPrintString(char *str){
     }
 }
 
+// Escribe un caracter en el descriptor indicado
 void shellPutchar(char c, uint64_t fd){
     //char backspace = '\b';
     //char cursor = CURSOR;
@@ -113,6 +117,7 @@ void shellPutchar(char c, uint64_t fd){
     //sys_write(STDOUT, &cursor, 1); // escribo el cursor
 }
 
+// Salto de línea
 void shellNewline(){
     shellPutchar('\n', STDOUT);
 }

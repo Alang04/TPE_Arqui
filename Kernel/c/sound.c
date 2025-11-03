@@ -5,11 +5,13 @@
 extern uint8_t inb(uint16_t port);
 extern void outb(uint16_t port, uint8_t data);
 
+// Apaga el parlante de PC
 void turnOff(){
     uint8_t tmp = inb(PC_SPEAKER_PORT) & SPEAKER_OFF_MASK;
     outb(PC_SPEAKER_PORT, tmp);
 }
 
+// Configura PIT Ch2 y habilita parlante a 'freq' Hz (0 apaga)
 void startSpeaker(uint32_t freq){
     if(freq == 0){
         turnOff();
@@ -30,6 +32,7 @@ void startSpeaker(uint32_t freq){
     return;
 }
 
+// Beep bloqueante: suena 'time' ticks y apaga
 void beep(uint32_t freq, uint64_t time){
     startSpeaker(freq);
     sleep(time);
