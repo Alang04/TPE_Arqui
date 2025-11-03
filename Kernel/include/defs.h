@@ -36,5 +36,9 @@
 #define R_ARROW 0x4D
 #define UP_ARROW 0x48
 #define DOWN_ARROW 0x50
+#define BREAKCODE_OFFSET 128
+#define L_CONTROL 29
+#define LETTERS 26
+#define BACKSPACE 0x0E
 
 #endif

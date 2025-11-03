@@ -1,7 +1,7 @@
-#include "videoDriver.h"
-#include "font.h"
+#include "../include/videoDriver.h"
+#include "../include/font.h"
 #include <stdint.h>
-#include "defs.h"
+#include "../include/defs.h"
 #include <string.h>
 
 typedef struct vbe_mode_info_structure{
@@ -121,8 +121,20 @@ void newLine(){
 }
 
 void videoPutChar(uint8_t c, uint32_t color){
-    if(c == '\n'){ 
+    if(c == '\n' || c == '\r'){ 
         newLine();
+        return;
+    }
+
+    
+    if(c == '\b'){
+        uint64_t stepX = FONT_WIDTH * defaultTextSize;
+        uint64_t stepY = FONT_HEIGHT * defaultTextSize;
+        if(currentX >= stepX){
+            currentX -= stepX;
+            fillRectangle(currentX, currentY, currentX + stepX, currentY + stepY, bgColor);
+            updateCursor();
+        }
         return;
     }
 

@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <idtLoader.h>
-#include <defs.h>
-#include <interrupts.h>
+#include "idtLoader.h"
+#include "defs.h"
+#include "interrupts.h"
 
 #pragma pack(push)
 #pragma pack (1)
@@ -40,7 +40,7 @@ void load_idt(){
   __asm__ __volatile__("lidt %0" : : "m"(idtr));
 
   // Mask PIC: enable only timer
-  picMasterMask(0xFE);
+  picMasterMask(0xFC);
   picSlaveMask(0xFF);
 
   _sti();

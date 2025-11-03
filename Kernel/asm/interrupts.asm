@@ -15,6 +15,7 @@ GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
 GLOBAL getSyscallIntRoutineAddr
+GLOBAL pressed_key
 EXTERN irqDispatcher
 EXTERN int80Dispatcher
 EXTERN exceptionDispatcher

@@ -16,7 +16,7 @@ uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
 }
 
 uint64_t sys_read(char * buff, uint64_t count){
-   return readBuff(buff, count);
+   return readKeyBuff(buff, count);
 }
 
 void sys_date(uint8_t * buff){
