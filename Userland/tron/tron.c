@@ -7,4 +7,4 @@ typedef struct position {
 
 static char tronTable[TABLE_LENGHT][TABLE_HEIGHT] = {0};
 
-static char directions[][] = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}};
+static char directions[][] = {{0, 1}, {0, -1}, {-1, 0}, {1, 0}}; 
