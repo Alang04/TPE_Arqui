@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 //extern uint8_t getPressedKey();
-extern volatile uint8_t pressed_key;
+extern uint8_t kbd_scancode_read(void);
 
 char kbd_min[KBD_LENGTH] = {
     0,  27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b', // backspace
@@ -82,8 +82,7 @@ uint64_t readKeyBuff(char * buff, uint64_t count){
 
 // Traduce el scancode leído por la ISR y lo almacena en el buffer
 void handlePressedKey(){
-    uint8_t scancode = pressed_key;
-    pressed_key = 0;
+    uint8_t scancode = kbd_scancode_read();
 
     if(scancode == L_SHIFT || scancode == R_SHIFT){
         shift = 1;

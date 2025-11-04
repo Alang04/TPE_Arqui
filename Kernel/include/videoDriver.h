@@ -1,34 +1,41 @@
+// Header matching the implementations in Kernel/drivers/videoDriver.c
 #ifndef VIDEODRIVER_H
 #define VIDEODRIVER_H
 
 #include <stdint.h>
 
-uint16_t getScreenHeight(void);
+/* Screen / mode information */
 uint16_t getScreenWidth(void);
+uint16_t getScreenHeight(void);
+int validPosition(uint64_t x, uint64_t y);
+
+/* Text size helpers */
+void setDefaultTextSize(uint64_t size);
+uint64_t getDefaultTextSize(void);
+void setTextSize(uint8_t size);
+void increaseFontSize(void);
+void decreaseFontSize(void);
+
+/* Pixel and drawing primitives */
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y);
-void printChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
-void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
 void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
-void printFillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
-void helperFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color);
-void putChar(uint8_t c, uint32_t color);
-void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
-int abs(int x);
-void drawFigure(uint32_t x, uint32_t y, char c, uint32_t color);
-void newLine();
-void scroll();
+void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color);
+
+/* Character / text drawing */
 void videoPutChar(uint8_t c, uint32_t color);
 void videoPrint(const char *str, uint32_t color);
-void moveRight();
-void updateCursor();
-int validPosition(uint64_t x,  uint64_t y);
-void setTextSize(uint8_t size);
+void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
+void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
+void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
+void moveRight(void);
+void updateCursor(void);
+void newLine(void);
+void scroll(void);
 void clearScreen(uint32_t color);
-void setDefaultTextSize(uint64_t size);
-uint64_t getDefaultTextSize();
-void increaseFontSize();
-void decreaseFontSize();
+
+/* Utility */
+int abs(int x);
 
 #endif

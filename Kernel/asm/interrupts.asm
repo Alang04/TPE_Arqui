@@ -16,6 +16,7 @@ GLOBAL _exception6Handler
 GLOBAL syscallIntRoutine
 GLOBAL pressed_key
 GLOBAL regsArray
+GLOBAL kbd_scancode_read
 EXTERN irqDispatcher
 EXTERN int80Dispatcher
 EXTERN exceptionDispatcher
@@ -275,6 +276,16 @@ _irq128Handler:
 haltcpu:
 	cli
 	hlt
+	ret
+
+; Lee el scancode almacenado por la ISR y lo limpia (no requiere volatile en C)
+kbd_scancode_read:
+	push rbp
+	mov rbp, rsp
+	xor eax, eax
+	mov al, [pressed_key]
+	mov byte [pressed_key], 0
+	pop rbp
 	ret
 
 SECTION .bss
