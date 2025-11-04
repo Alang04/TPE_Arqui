@@ -2,10 +2,8 @@
 #define _TIME_H_
 
 void sleep(int ms);
-unsigned long deltaTicks();
-void timer_handler();
-int ticks_elapsed();
-int seconds_elapsed();
+unsigned long deltaTicks(void);
+void timer_handler(void);
 void date(unsigned char *buff);
 void time(unsigned char *buff);
 

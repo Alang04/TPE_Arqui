@@ -17,4 +17,8 @@ void sys_beep(uint32_t freq, uint64_t time);
 uint64_t sys_ticks();
 void sys_clear();
 
+// Nuevas syscalls para audio no bloqueante
+void sys_speaker_start(uint32_t freq);
+void sys_speaker_off();
+
 #endif

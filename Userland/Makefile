@@ -4,7 +4,7 @@ MODULE=0000-sampleCodeModule.bin
 SAMPLE_DATA=0001-sampleDataModule.bin
 
 # Project layout uses c/, asm/, include/
-SOURCES=$(wildcard _loader.c c/*.c)
+SOURCES=$(wildcard _loader.c c/*.c tron/src/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
@@ -15,7 +15,7 @@ $(MODULE): $(OBJECTS) $(OBJECTS_ASM)
 	$(LD) $(LDFLAGS) -T sampleCodeModule.ld -o $(MODULE) $(OBJECTS) $(OBJECTS_ASM)
 
 %.o: %.c
-	$(GCC) $(GCCFLAGS) -Ic/include -c $< -o $@
+	$(GCC) $(GCCFLAGS) -Ic/include -Itron/include -c $< -o $@
 
 %.o: %.asm
 	$(ASM) $(ASMFLAGS) $< -o $@

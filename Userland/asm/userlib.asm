@@ -9,6 +9,8 @@ GLOBAL sys_increase_fontsize
 GLOBAL sys_decrease_fontsize
 GLOBAL sys_ticks
 GLOBAL sys_beep
+GLOBAL sys_speaker_start
+GLOBAL sys_speaker_off
 GLOBAL gen_invalid_opcode
 
 section .text
@@ -60,6 +62,18 @@ sys_ticks:
 
 sys_clear:
     mov rax, 9
+	int 0x80
+	ret
+
+; No bloqueante: enciende el parlante a 'freq' Hz (0 apaga)
+sys_speaker_start:
+	mov rax, 10
+	int 0x80
+	ret
+
+; No bloqueante: apaga el parlante
+sys_speaker_off:
+	mov rax, 11
 	int 0x80
 	ret
 

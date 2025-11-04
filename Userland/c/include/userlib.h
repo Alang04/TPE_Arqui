@@ -50,28 +50,34 @@ void sys_decrease_fontsize(void);
 void sys_beep(uint32_t freq, uint64_t time);
 uint64_t sys_ticks(void);
 void sys_clear(void);
-uint64_t print_string(char *str);
+
+// Audio no bloqueante para música de fondo
+void sys_speaker_start(uint32_t freq);
+void sys_speaker_off(void);
 uint64_t putchar(char c);
-uint64_t print_string(char *str);
-char getchar();
+char getchar(void);
 void processLine(char * buff, uint32_t * history_len);
 
-void help();
-void clear();
-void registers();
-void divideByZero();
-void printTime();
-void printDate();
-void playBeep();
-void invOp();
+// Utility available across userland modules
+uint64_t num_to_str(uint64_t value, char * dest, int base);
+void gen_invalid_opcode(void);
+
+void help(void);
+void clear(void);
+void registers(void);
+void divideByZero(void);
+void printTime(void);
+void printDate(void);
+void playBeep(void);
+void invOp(void);
 uint8_t adjustHour(uint8_t hour, int offset);
 void printTimeAndDate(uint8_t* buff, char separator);
-void shellIncreaseFontSize();
-void shellDecreaseFontSize();
-void redrawFont();
-void bmMEM();
-void bmCPU();
-void bmFPS();
-void bmKEY();
+void shellIncreaseFontSize(void);
+void shellDecreaseFontSize(void);
+void redrawFont(void);
+void bmMEM(void);
+void bmCPU(void);
+void bmFPS(void);
+void bmKEY(void);
 
 #endif

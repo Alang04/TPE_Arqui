@@ -1,12 +1,12 @@
 #include "time.h"
 #include "interrupts.h"
 
-unsigned char getSeconds();
-unsigned char getMinutes();
-unsigned char getHour();
-unsigned char getDayOfMonth();
-unsigned char getMonth();
-unsigned char getYear();
+unsigned char getSeconds(void);
+unsigned char getMinutes(void);
+unsigned char getHour(void);
+unsigned char getDayOfMonth(void);
+unsigned char getMonth(void);
+unsigned char getYear(void);
 
 static unsigned long ticks = 0;
 
@@ -45,10 +45,3 @@ void timer_handler(){
 	ticks++;
 }
 
-int ticks_elapsed(){
-	return ticks;
-}
-
-int seconds_elapsed(){
-	return ticks / 18;
-}

@@ -56,6 +56,15 @@ uint64_t sys_ticks(){
     return deltaTicks();
 }
 
+// Audio no bloqueante: controlar el parlante directamente
+void sys_speaker_start(uint32_t freq){
+    startSpeaker(freq);
+}
+
+void sys_speaker_off(){
+    turnOff();
+}
+
 void * syscalls[CANT_SYS] = {
     &sys_registers,         // 0
     &sys_time,              // 1
@@ -66,5 +75,7 @@ void * syscalls[CANT_SYS] = {
     &sys_decrease_fontsize, // 6
     &sys_beep,              // 7
     &sys_ticks,             // 8
-    &sys_clear              // 9
+    &sys_clear,             // 9
+    &sys_speaker_start,     // 10
+    &sys_speaker_off        // 11
 };

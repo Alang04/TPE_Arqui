@@ -1,7 +1,10 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "../c/include/userlib.h"
+#include "../tron/include/tron_main.h"
 #include "../c/include/shell.h"
+
+static void tron_command_wrapper(void);
 
 static Command commands[] = {
     {"help", help},
@@ -16,9 +19,14 @@ static Command commands[] = {
     {"bmCPU", bmCPU},
     {"bmMEM", bmMEM},
     {"bmKEY", bmKEY},
+    {"tron", tron_command_wrapper},
     {0, 0},
 };
 
+static void tron_command_wrapper(void){
+    sys_clear();
+    (void)tron_main();
+}
 RedrawStruct redrawBuffer[REDRAW_BUFF];
 uint32_t redrawLength = 0;
 void redraw_reset(void){
@@ -331,18 +339,19 @@ void help(){
     shellPrintString("Comandos disponibles: \n");
     shellPrintString("help      ->   muestra la lista de comandos.\n");
     shellPrintString("clear     ->   limpia la pantalla.\n");
+    shellPrintString("+         ->   aumenta tamaño de fuente.\n");
+    shellPrintString("-         ->   disminuye tamaño de fuente.\n");
     shellPrintString("printTime ->   imprime la hora actual.\n");
     shellPrintString("printDate ->   imprime la fecha actual.\n");
     shellPrintString("registers ->   imprime registros.\n");
     shellPrintString("testDiv0  ->   division por cero.\n");
     shellPrintString("invOp     ->   instruccion invalida.\n");
     shellPrintString("playBeep  ->   reproduce un beep.\n");
-    shellPrintString("+         ->   aumenta tamaño de fuente.\n");
-    shellPrintString("-         ->   disminuye tamaño de fuente.\n");
     shellPrintString("bmFPS     ->   benchmark de FPS.\n");
     shellPrintString("bmCPU     ->   benchmark de CPU.\n");
     shellPrintString("bmMEM     ->   benchmark de MEM.\n");
     shellPrintString("bmKEY     ->   benchmark de teclado.\n");
+    shellPrintString("tron      ->   inicia el juego TRON.\n");
 }
 // Limpia la pantalla
 void clear(){

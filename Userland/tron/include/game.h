@@ -5,7 +5,6 @@
 #include "types.h"
 #include "config.h"
 
-// Opaque game state
 typedef struct TronGame TronGame;
 
 // Crea una instancia del juego con parámetros iniciales.
@@ -22,6 +21,9 @@ void game_reset_round(TronGame *g);
 
 // Habilita/deshabilita IA y setea dificultad (0=básica, 1=media, 2=alta)
 void game_enable_ai(TronGame *g, int enabled);
+
+// Ajusta la velocidad lógica (ticks por step). Mínimo 1.
+void game_set_speed(TronGame *g, int ticks_per_step);
 
 // Encola un cambio de dirección a aplicar en el próximo step.
 // player_id: 1 para P1, 2 para P2.

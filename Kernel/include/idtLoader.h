@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void load_idt();
+void load_idt(void);
 
 #endif

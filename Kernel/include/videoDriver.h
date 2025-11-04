@@ -26,16 +26,8 @@ void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uin
 /* Character / text drawing */
 void videoPutChar(uint8_t c, uint32_t color);
 void videoPrint(const char *str, uint32_t color);
-void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
-void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size);
-void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
-void moveRight(void);
-void updateCursor(void);
 void newLine(void);
 void scroll(void);
 void clearScreen(uint32_t color);
-
-/* Utility */
-int abs(int x);
 
 #endif

@@ -42,10 +42,16 @@ typedef struct vbe_mode_info_structure{
 
 static vbe_mode_info_t * vbe_mode_info = (vbe_mode_info_t *) 0x5C00;
 
-static int currentX = 0;
-static int currentY = 0;
+static uint64_t currentX = 0;
+static uint64_t currentY = 0;
 static const int bgColor = 0x000000;   // Negro
 static uint64_t defaultTextSize = TEXT_SIZE; // Tamaño por defecto (ajustable)
+
+// Internal helpers (forward declarations)
+static void updateCursor(void);
+static void moveRight(void);
+static int abs(int x);
+static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
 
 // API utilitaria
 // Ancho en píxeles del modo actual
@@ -71,7 +77,7 @@ int validPosition(uint64_t x,  uint64_t y){
     return x < vbe_mode_info->width && y < vbe_mode_info->height;
 }
 
-/* FUNCIONES DEMODO TEXTO. */
+/* FUNCIONES DE MODO TEXTO. */
 
 void increaseFontSize(){
     if (defaultTextSize < MAX_FONT_SIZE){
@@ -149,8 +155,8 @@ void videoPutChar(uint8_t c, uint32_t color){
 
     
     if(c == '\b'){
-        uint64_t stepX = FONT_WIDTH * defaultTextSize;
-        uint64_t stepY = FONT_HEIGHT * defaultTextSize;
+    uint64_t stepX = (uint64_t)FONT_WIDTH * defaultTextSize;
+    uint64_t stepY = (uint64_t)FONT_HEIGHT * defaultTextSize;
         if(currentX >= stepX){
             currentX -= stepX;
             fillRectangle(currentX, currentY, currentX + stepX, currentY + stepY, bgColor);
@@ -176,7 +182,7 @@ void videoPrint(const char *str, uint32_t color){
 }
 
 // Avanza el cursor horizontalmente con wrap
-void moveRight(){
+static void moveRight(){
     uint64_t stepX = (uint64_t)FONT_WIDTH * defaultTextSize;
     if(currentX + stepX < vbe_mode_info->width){
         currentX += stepX;
@@ -186,22 +192,13 @@ void moveRight(){
 }
 
 // Asegura que el cursor esté en una posición válida
-void updateCursor(){
+static void updateCursor(){
     if(!validPosition(currentX + (uint64_t)FONT_WIDTH * defaultTextSize - 1, currentY + (uint64_t)FONT_HEIGHT * defaultTextSize - 1)){
         newLine();
     }
 }
 
 // Imprime una cadena en (x,y) con tamaño escalado
-void printString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size){
-    if(str == 0){
-        return;
-    }
-
-    for(unsigned long int i = 0; str[i] != '\0'; i++){
-        drawChar((uint32_t)(x + (uint64_t)FONT_WIDTH * size * i), (uint32_t)y, (uint8_t)str[i], color, size);
-    }
-}
 
 void setTextSize(uint8_t size){
     if(size == 0){
@@ -212,9 +209,9 @@ void setTextSize(uint8_t size){
 }
 
 
-/* MODO GRAFICO */
+/* FUNCIONES DE MODO GRAFICO */
 
-int abs(int x){ 
+static int abs(int x){ 
     return (x < 0) ? (-x) : (x);
 }
 
@@ -301,18 +298,9 @@ void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uin
 }
 
 // Dibuja una cadena en (x,y) tamaño escalado
-void drawString(const char *str, uint64_t x, uint64_t y, uint32_t color, uint64_t size){
-    if (str == 0){
-        return;
-    }
-
-    for(unsigned int i = 0; str[i] != '\0'; i++){
-        drawChar((uint32_t)(x + (uint64_t)FONT_WIDTH * size * i), (uint32_t)y, (uint8_t)str[i], color, size);
-    }
-}
 
 // Dibuja un carácter usando la bitmap de la fuente
-void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
+static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
     if (c >= 128){
         return;
     }
