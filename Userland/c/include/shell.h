@@ -1,5 +1,3 @@
-// API de solo consumo (userland): utilidades de shell
-// Contrato: funciones imprimen a STDOUT y leen de teclado usando userlib.
 #ifndef SHELL_H
 #define SHELL_H
 

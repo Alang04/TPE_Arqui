@@ -1,4 +1,3 @@
-/* Simple text menus for Tron */
 #include <stdint.h>
 #include <stddef.h>
 #include "../include/menu.h"

@@ -1,4 +1,3 @@
-; Wrappers de syscalls (int 0x80) - ver índices en Kernel/c/syscallDispatcher.c
 GLOBAL sys_write
 GLOBAL sys_read
 GLOBAL sys_registers
@@ -69,19 +68,16 @@ sys_clear:
 	int 0x80
 	ret
 
-; No bloqueante: enciende el parlante a 'freq' Hz (0 apaga)
 sys_speaker_start:
 	mov rax, 10
 	int 0x80
 	ret
 
-; No bloqueante: apaga el parlante
 sys_speaker_off:
 	mov rax, 11
 	int 0x80
 	ret
 
-; Dimensiones de pantalla
 sys_screen_width:
 	mov rax, 12
 	int 0x80
@@ -92,7 +88,6 @@ sys_screen_height:
 	int 0x80
 	ret
 
-; Dibujo básico
 sys_putpixel:
 	mov rax, 14
 	int 0x80

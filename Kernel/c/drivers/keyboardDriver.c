@@ -5,9 +5,6 @@
 #include "../include/lib.h"
 #include <stdint.h>
 
-//extern uint8_t getPressedKey();
-extern uint8_t kbd_scancode_read(void);
-
 char kbd_min[KBD_LENGTH] = {
     0,  27, '1','2','3','4','5','6','7','8','9','0','-','=', '\b', // backspace
     '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n',     //tab y enter
@@ -31,13 +28,11 @@ static char buff[BUFF_LENGTH];
 static char registersBuff[REGISTERS_BUFFER_SIZE];
 static int shift = 0;
 static int caps = 0;
-int buff_size = 0;
-int start_index = 0;
-int end_index = 0;
-int boolRegisters = 0;
-
-// Forward declaration to avoid implicit declaration warning
-void storeSnapshot(void);
+static int buff_size = 0;
+static int start_index = 0;
+static int end_index = 0;
+static int boolRegisters = 0;
+static void storeSnapshot(void);
 
 // Inserta un caracter en el buffer circular de teclado
 void writeBuff(unsigned char c){
@@ -51,14 +46,14 @@ void writeBuff(unsigned char c){
 }
 
 // Reinicia el buffer de teclado
-void clearBuff(){
+void clearBuff(void){
     buff_size = 0;
     start_index = 0;
     end_index = 0;
 }
 
 // Extrae un byte del buffer; -1 si vacío
-uint8_t getFromBuffer(){
+uint8_t getFromBuffer(void){
     if(buff_size == 0){
         return (uint8_t) - 1;
     }
@@ -72,8 +67,8 @@ uint8_t getFromBuffer(){
 
 // Copia hasta 'count' bytes disponibles del buffer de teclado
 uint64_t readKeyBuff(char * buff, uint64_t count){
-    int i;
-    for(i = 0; i < count && i < buff_size; i++){
+    uint64_t i;
+    for(i = 0; i < count && i < (uint64_t)buff_size; i++){
         buff[i] = getFromBuffer();
     }
 
@@ -81,7 +76,7 @@ uint64_t readKeyBuff(char * buff, uint64_t count){
 }
 
 // Traduce el scancode leído por la ISR y lo almacena en el buffer
-void handlePressedKey(){
+void handlePressedKey(void){
     uint8_t scancode = kbd_scancode_read();
 
     if(scancode == L_SHIFT || scancode == R_SHIFT){
@@ -91,7 +86,6 @@ void handlePressedKey(){
     }else if(scancode == L_ARROW || scancode == R_ARROW || scancode == UP_ARROW || scancode == DOWN_ARROW || scancode == 0 || scancode > BREAK_CODE){
         return;
     } else if(scancode == L_CONTROL){
-        //ARREGLAR PROBLEMA DE CTRL NO GUARDA REGISTROS SOLO CLEAR?
         storeSnapshot();
         boolRegisters = 1;
         return;
@@ -120,7 +114,7 @@ uint64_t copyRegistersBuffer(char * buff){
 
 // Serializa los registros guardados por la ISR en formato legible
 void storeSnapshot(){
-    char * regs[] = {"RAX: 0x", "RBX: 0x", "RCX: 0x", "RDX: 0x", "RBP: 0x", "RDI: 0x", "RSI: 0x",  
+    const char * regs[] = {"RAX: 0x", "RBX: 0x", "RCX: 0x", "RDX: 0x", "RBP: 0x", "RDI: 0x", "RSI: 0x",  
      "R8: 0x", "R9: 0x", "R10: 0x", "R11: 0x", "R12: 0x", "R13: 0x", "R14: 0x", "R15: 0x", "RIP: 0x", "CS: 0x", "RFLAGS: 0x", "RSP: 0x", "SS: 0x", 0};
 
     uint32_t j = 0;
@@ -140,14 +134,9 @@ void storeSnapshot(){
   registersBuff[j] = 0;
 }
 
-/* Contrato:
-       - Escribe en `dest` la representación hexadecimal (mayúsculas) del valor
-         usando exactamente hasta 16 dígitos, rellenando con ceros a la izquierda
-         para completar 16 dígitos.
-       - Devuelve la cantidad de caracteres hex escritos (normalmente 16).
-       - No comprueba el tamaño del buffer `dest`; el llamador debe garantizar
-         espacio suficiente (>=16). Si `dest` es NULL la función retorna 0.
-    */
+/* Escribe en `dest` la representación hexadecimal (mayúsculas) del valor
+usando exactamente hasta 16 dígitos, rellenando con ceros a la izquierda
+para completar 16 dígitos. */
 uint32_t intToHexa(uint64_t value, char *dest){
     if (!dest){
         return 0;

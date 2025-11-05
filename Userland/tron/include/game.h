@@ -21,7 +21,7 @@ void game_destroy(TronGame *g);
 // Reinicia la ronda (posiciones, trazas, ganador) manteniendo puntuaciones.
 void game_reset_round(TronGame *g);
 
-// Habilita/deshabilita IA y setea dificultad (0=básica, 1=media, 2=alta)
+// Habilita/deshabilita IA
 void game_enable_ai(TronGame *g, int enabled);
 
 // Ajusta la velocidad lógica (ticks por step). Mínimo 1.
@@ -43,5 +43,5 @@ Winner game_winner(const TronGame *g);
 // Obtiene un snapshot (copia de lectura) del estado para render/IA.
 void game_get_snapshot(const TronGame *g, GameSnapshot *out);
 
-#endif // TRON_GAME_H
+#endif
 

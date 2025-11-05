@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../include/lib.h"
 
 // Rellena 'length' bytes con el valor 'c'
 void * memset(void * destination, int32_t c, uint64_t length){

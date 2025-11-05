@@ -1,4 +1,3 @@
-; Removed unused exports: cpuVendor, getTime, getPressedKey, printRegisters
 GLOBAL getSeconds
 GLOBAL getMinutes
 GLOBAL getHour
@@ -7,7 +6,6 @@ GLOBAL getMonth
 GLOBAL getYear
 GLOBAL inb
 GLOBAL outb
-; No externs needed after removing printRegisters
 
 section .text
 	
@@ -29,8 +27,6 @@ getHour:
 	in al, 0x71
 	ret
 
-; getDayOfWeek removed (unused)
-
 getMonth:
 	mov al, 8
 	out 0x70, al
@@ -48,8 +44,6 @@ getDayOfMonth:
 	out 0x70, al
 	in al, 0x71
 	ret
-
-; getPressedKey removed (unused)
 
 outb:
 	push rbp
@@ -71,5 +65,3 @@ inb:
 
 	pop rbp
 	ret
-
-; printRegisters and its data removed (unused)

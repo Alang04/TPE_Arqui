@@ -1,4 +1,3 @@
-/* Tron entry point */
 #include <stdint.h>
 #include "../include/tron_main.h"
 #include "../include/game.h"
@@ -7,7 +6,7 @@
 #include "../include/ai.h"
 #include "../include/menu.h"
 #include "../include/tron_sound.h"
-#include "../../c/include/userlib.h" // sys_* wrappers
+#include "../../c/include/userlib.h"
 
 int tron_main(void){
     sys_clear();
@@ -100,8 +99,13 @@ int tron_main(void){
             // Actualiza música de fondo
             tron_music_update();
 
-            // Render
+            // Render: no limpiar cada frame en modo video para preservar el trail
+#if TRON_RENDER_VIDEO
+            /* En modo video hacemos render incremental; no limpiar el framebuffer
+               en cada iteración para que el cache de celdas coincida con lo dibujado. */
+#else
             render_clear();
+#endif
             GameSnapshot snap2; 
             game_get_snapshot(g, &snap2);
             if(paused && snap2.state == STATE_PLAYING){

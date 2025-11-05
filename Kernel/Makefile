@@ -1,7 +1,6 @@
 include Makefile.inc
 
 KERNEL=kernel.bin
-# C sources live under c/ and c/drivers/
 SOURCES=$(wildcard c/*.c c/drivers/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)

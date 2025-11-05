@@ -11,7 +11,7 @@ unsigned char getYear(void);
 static unsigned long ticks = 0;
 
 // Duerme aprox. 'ms' milisegundos usando ticks y HLT
-void sleep(int ms){
+void sleep(unsigned long ms){
 	unsigned long start = ticks;
 
 	unsigned long target = ms / 10;

@@ -1,4 +1,3 @@
-// API de solo consumo (Tron menú): I/O por texto, no bloqueante, configura partida
 #ifndef TRON_MENU_H
 #define TRON_MENU_H
 
@@ -17,5 +16,5 @@ typedef struct {
 // Devuelve 0 si el usuario eligió salir.
 int menu_show_and_get_config(MenuConfig *out);
 
-#endif // TRON_MENU_H
+#endif
 

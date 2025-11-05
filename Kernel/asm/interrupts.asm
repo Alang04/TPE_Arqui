@@ -4,6 +4,7 @@ GLOBAL picMasterMask
 GLOBAL picSlaveMask
 GLOBAL haltcpu
 GLOBAL _hlt
+GLOBAL load_idt_asm
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
 GLOBAL _irq02Handler
@@ -26,7 +27,6 @@ EXTERN syscalls
 SECTION .text
 
 %macro pushState 0
-
 	push rax
 	push rbx
 	push rcx
@@ -45,7 +45,6 @@ SECTION .text
 %endmacro
 
 %macro popState 0
-
 	pop r15
 	pop r14
 	pop r13
@@ -148,11 +147,18 @@ _sti:
 	sti
 	ret
 
+; C-callable wrapper to load IDT without using inline asm in C
+; void load_idt_asm(void *idtr);
+; SysV AMD64: first arg in RDI -> pointer to IDTR descriptor (10 bytes)
+load_idt_asm:
+	lidt    [rdi]
+	ret
+
 picMasterMask:
 	push    rbp
    	mov     rbp, rsp
     	mov     ax, di
-    	out	    21h,al
+    	out	   21h,al
     	pop     rbp
     	retn
 
@@ -279,7 +285,7 @@ haltcpu:
 	hlt
 	ret
 
-; Lee el scancode almacenado por la ISR y lo limpia (no requiere volatile en C)
+; Lee el scancode almacenado por la ISR y lo limpia (sin requerir calificador especial en C)
 kbd_scancode_read:
 	push rbp
 	mov rbp, rsp

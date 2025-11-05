@@ -24,4 +24,4 @@
 #define render_clear render_text_clear
 #endif
 
-#endif // TRON_RENDER_H
+#endif

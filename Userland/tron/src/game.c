@@ -1,4 +1,3 @@
-/* Core game logic for Tron */
 #include <stdint.h>
 #include "../include/game.h"
 #include "../include/config.h"
@@ -28,7 +27,6 @@ struct TronGame {
     PlayerState p2;
 };
 
-// Single static state (freestanding, no malloc)
 static struct TronGame g_state;
 
 // Helpers

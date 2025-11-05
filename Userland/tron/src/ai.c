@@ -1,4 +1,3 @@
-/* Simple safe-first AI for player 2 by default */
 #include "../include/ai.h"
 #include "../include/types.h"
 

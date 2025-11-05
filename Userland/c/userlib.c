@@ -173,6 +173,7 @@ void bmMEM(){
      *   intermediate overflow on 32-bit platforms.
      */
     char buffer[4 * KB];
+    uint64_t totalChecksum = 0;
     uint64_t ticks = sys_ticks();
 
     for(int iteration = 0; iteration < 10000; iteration++){
@@ -181,7 +182,7 @@ void bmMEM(){
         }
 
         /* use 64-bit checksum to avoid truncation issues */
-        volatile uint64_t checksum = 0;
+        uint64_t checksum = 0;
         for(int i = 0; i < 4 * KB; i++){
             checksum += (unsigned char)buffer[i];
             checksum = checksum % 1000000ULL;
@@ -190,6 +191,9 @@ void bmMEM(){
         for(int i = 0; i < 2 * KB; i++){
             buffer[i + 2 * KB] = buffer[i];
         }
+
+        /* make checksum observable to prevent over-optimization */
+        totalChecksum += checksum;
     }
 
     uint64_t finalTicks = sys_ticks();
@@ -211,6 +215,12 @@ void bmMEM(){
         shellPrintString(buff);
         shellPrintString("\n");
     }
+
+    /* Print a checksum summary to ensure computations aren't optimized away */
+    shellPrintString("Checksum: ");
+    num_to_str(totalChecksum, buff, 10);
+    shellPrintString(buff);
+    shellPrintString("\n");
 }
 
 // Mide tiempo hasta presionar una tecla
@@ -333,6 +343,7 @@ void help(){
     shellPrintString("bmKEY     ->   benchmark de teclado.\n");
     shellPrintString("tron      ->   inicia el juego TRON.\n");
 }
+
 // Limpia la pantalla
 void clear(){
     sys_clear();
@@ -483,7 +494,6 @@ uint64_t putchar(char c){
     return sys_write(STDOUT, buff, 1);
 }
 
-// getchar bloqueante (espera hasta recibir 1 byte)
 char getchar(){
     char c;
     while(sys_read(&c, 1) == 0)

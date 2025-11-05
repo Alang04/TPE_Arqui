@@ -16,6 +16,7 @@ void _exception6Handler(void);
 void _cli(void);
 void _sti(void);
 void _hlt(void);
+void load_idt_asm(void * idtr);
  
 void picMasterMask(uint8_t mask);
 void picSlaveMask(uint8_t mask);

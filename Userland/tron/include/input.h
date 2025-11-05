@@ -1,4 +1,3 @@
-// API de solo consumo (Tron input): lectura no bloqueante y mapeo de teclas
 #ifndef TRON_INPUT_H
 #define TRON_INPUT_H
 
@@ -29,4 +28,4 @@ void input_poll(InputEvents *out);
 int input_map_key_to_dir_for_p1(char c, Direction *out);
 int input_map_key_to_dir_for_p2(char c, Direction *out);
 
-#endif // TRON_INPUT_H
+#endif

@@ -17,7 +17,6 @@ Exception exceptionsArray[] =
 char * exceptionMessage[] = { "zeroDivision Exception!", "invalidOpcode Exception!"};
 
 // regsArray es llenado por la ISR (asm/interrupts.asm) al ocurrir una excepción
-extern uint64_t regsArray[20];
 
 static void printHex64(uint64_t val){
 	char buff[32];
@@ -26,13 +25,19 @@ static void printHex64(uint64_t val){
 	uint32_t n = uintToBase(val, tmp, 16);
 	uint32_t pad = (n < 16) ? (16 - n) : 0;
 	uint32_t k = 0;
-	for(uint32_t i = 0; i < pad; i++) buff[k++] = '0';
-	for(uint32_t i = 0; i < n; i++) buff[k++] = tmp[i];
+	for(uint32_t i = 0; i < pad; i++){
+		buff[k++] = '0';
+	}
+
+	for(uint32_t i = 0; i < n; i++){
+		buff[k++] = tmp[i];
+	}
+	
 	buff[k] = 0;
 	videoPrint(buff, 0xFFFFFF);
 }
 
-static void printRegistersSnapshot(){
+static void printRegistersSnapshot(void){
 	const char * regs[] = {
 		"RAX: 0x", "RBX: 0x", "RCX: 0x", "RDX: 0x", "RBP: 0x", "RDI: 0x", "RSI: 0x",
 		"R8 : 0x", "R9 : 0x", "R10: 0x", "R11: 0x", "R12: 0x", "R13: 0x", "R14: 0x", "R15: 0x",
@@ -46,11 +51,11 @@ static void printRegistersSnapshot(){
 	}
 }
 
-void zeroDivision(){
+void zeroDivision(void){
 	exceptionHandler(exceptionMessage[0]);
 }
 
-void invalidOpcode(){
+void invalidOpcode(void){
 	exceptionHandler(exceptionMessage[1]);
 }
 

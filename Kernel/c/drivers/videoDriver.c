@@ -44,17 +44,14 @@ static vbe_mode_info_t * vbe_mode_info = (vbe_mode_info_t *) 0x5C00;
 
 static uint64_t currentX = 0;
 static uint64_t currentY = 0;
-static const int bgColor = 0x000000;   // Negro
-static uint64_t defaultTextSize = TEXT_SIZE; // Tamaño por defecto (ajustable)
-
-// Internal helpers (forward declarations)
+static const int bgColor = 0x000000;            // Negro
+static uint64_t defaultTextSize = TEXT_SIZE;    // Tamaño por defecto
 static void updateCursor(void);
 static void moveRight(void);
 static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
 static void v_fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
 static void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color);
 
-// API utilitaria
 // Ancho en píxeles del modo actual
 uint16_t getScreenWidth(){ 
     return vbe_mode_info->width;
@@ -200,7 +197,6 @@ static void updateCursor(){
 }
 
 // Imprime una cadena en (x,y) con tamaño escalado
-
 void setTextSize(uint8_t size){
     if(size == 0){
         size = 1;
@@ -211,8 +207,6 @@ void setTextSize(uint8_t size){
 
 
 /* FUNCIONES DE MODO GRAFICO */
-
-// (drawLine removed: not used by current kernel/userland)
 
 // Rellena un rectángulo [x0,y0) x [x1,y1)
 static void v_fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
@@ -245,14 +239,10 @@ static void v_fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, 
     }
 }
 
-// Dibuja el contorno de un rectángulo
-
 // Rellena un rectángulo usando ancho/alto
 static void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color){
     v_fillRectangle(x, y, (uint64_t)x + width, (uint64_t)y + height, color);
 }
-
-// Dibuja una cadena en (x,y) tamaño escalado
 
 // Dibuja un carácter usando la bitmap de la fuente
 static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size){
@@ -283,13 +273,11 @@ static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t
 
 // Limpia toda la pantalla y resetea el cursor
 void clearScreen(uint32_t color){
-    // Clear the screen and reset cursor to top-left
     drawFilledRect(0, 0, vbe_mode_info->width, vbe_mode_info->height, color);
     currentX = 0;
     currentY = 0;
 }
 
-// API pública: rellena un rectángulo en (x,y) tamaño (w,h)
 void fillRect(uint64_t x, uint64_t y, uint64_t w, uint64_t h, uint32_t color){
     if(w == 0 || h == 0){
         return;

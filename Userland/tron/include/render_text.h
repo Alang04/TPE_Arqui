@@ -1,4 +1,3 @@
-// API de solo consumo (Tron render texto): dibuja snapshot en modo texto/ASCII
 #ifndef TRON_RENDER_TEXT_H
 #define TRON_RENDER_TEXT_H
 
@@ -16,4 +15,4 @@ void render_text_end(void);
 // Limpia pantalla / HUD
 void render_text_clear(void);
 
-#endif // TRON_RENDER_TEXT_H
+#endif

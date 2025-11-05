@@ -14,7 +14,6 @@ USERLAND=../Userland/0000-sampleCodeModule.bin ../Userland/0001-sampleDataModule
 PACKEDKERNEL=packedKernel.bin
 IMGSIZE=6291456
 
-# Build outputs depend on TARGET
 ifeq ($(TARGET),qemu)
 all: $(QCOW2)
 else ifeq ($(TARGET),vbox)

@@ -1,5 +1,6 @@
 #ifndef SOUND_H
 #define SOUND_H
+
 #include <stdint.h>
 
 #define PIT_BASE_HZ 1193180
@@ -12,6 +13,6 @@
 
 void startSpeaker(uint32_t freq);
 void beep(uint32_t freq, uint64_t time);
-void turnOff();
+void turnOff(void);
 
 #endif

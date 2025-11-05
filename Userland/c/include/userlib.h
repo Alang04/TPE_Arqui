@@ -42,10 +42,8 @@ typedef struct{
     uint64_t fd;
 }RedrawStruct;
 
-// Redraw buffer API
 void redraw_reset(void);
 void redraw_append_char(char c, uint64_t fd);
-
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count);
 uint64_t sys_read(char * buff, uint64_t count);
 uint64_t sys_registers(char * buff);
@@ -56,11 +54,8 @@ void sys_decrease_fontsize(void);
 void sys_beep(uint32_t freq, uint64_t time);
 uint64_t sys_ticks(void);
 void sys_clear(void);
-
-// Audio no bloqueante para música de fondo
 void sys_speaker_start(uint32_t freq);
 void sys_speaker_off(void);
-// Gráficas (framebuffer)
 uint64_t sys_screen_width(void);
 uint64_t sys_screen_height(void);
 void sys_putpixel(uint32_t color, uint64_t x, uint64_t y);
@@ -68,11 +63,8 @@ void sys_fill_rect(uint64_t x, uint64_t y, uint64_t w, uint64_t h, uint32_t colo
 uint64_t putchar(char c);
 char getchar(void);
 void processLine(char * buff, uint32_t * history_len);
-
-// Utility available across userland modules
 uint64_t num_to_str(uint64_t value, char * dest, int base);
 void gen_invalid_opcode(void);
-
 void help(void);
 void clear(void);
 void registers(void);

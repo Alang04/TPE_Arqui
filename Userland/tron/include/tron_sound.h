@@ -1,10 +1,8 @@
-// API de solo consumo (Tron sonido): jingles cortos y música de fondo no bloqueante
 #ifndef TRON_SOUND_H
 #define TRON_SOUND_H
 
 #include "types.h"
 
-// Fanfarria corta al iniciar una partida
 void tron_play_intro_song(void);
 
 // Jingle al terminar la ronda; cambia según el ganador

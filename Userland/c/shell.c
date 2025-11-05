@@ -1,7 +1,6 @@
 #include "shell.h"
 #include "userlib.h"
 
-// Visual cursor helpers (only used during input)
 static int cursorVisible = 0;
 static void showCursor(void){
     if(!cursorVisible){
@@ -49,7 +48,6 @@ void shellReadLine(char * buffer, uint64_t max){
     showCursor();
 
     while(1){
-        // Intento de lectura no bloqueante: devuelve 1 si hay tecla
         if(sys_read(&c, 1) == 1){
             if(c == '\n'){
                 break;
@@ -58,9 +56,9 @@ void shellReadLine(char * buffer, uint64_t max){
             if(c == '\b'){
                 if(idx > 0){
                     idx--;
-                    hideCursor();           // remover cursor '_'
+                    hideCursor();               // remover cursor '_'
                     shellPutchar('\b', STDOUT); // borrar último carácter
-                    showCursor();           // volver a dibujar cursor
+                    showCursor();               // volver a dibujar cursor
                 }
             } else if(c == '+'){
                 // Aumentar fuente y redibujar contenido

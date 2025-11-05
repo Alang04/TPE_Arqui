@@ -1,19 +1,16 @@
-/* Simple chiptune-like jingles and non-blocking background music for Tron */
 #include <stdint.h>
 #include "../include/tron_sound.h"
-#include "../include/types.h"     // Winner
-#include "../../c/include/userlib.h" // sys_* wrappers + NOTE_* and durations
+#include "../include/types.h"     
+#include "../../c/include/userlib.h" 
 
 // Local helper to play a sequence of (freq, ms) pairs (blocking)
 typedef struct { uint16_t f; uint16_t d; } Note;
 
 static void play_notes(const Note *seq, int len){
 	for(int i = 0; i < len; i++){
-		sys_beep(seq[i].f, seq[i].d); // bloqueante, se usa solo para jingles cortos
+		sys_beep(seq[i].f, seq[i].d);
 	}
 }
-
-// ------------------ Jingles (bloqueantes, cortos) ------------------
 
 void tron_play_intro_song(void){
 	static const Note s[] = {
@@ -36,21 +33,19 @@ void tron_play_game_over_song(Winner w){
 	}
 }
 
-// ------------------ Música de fondo no bloqueante ------------------
 
 typedef struct {
 	const Note *seq;
 	int len;
 	int idx;
 	int looping;
-	uint64_t note_start_ticks; // en ticks del sistema
+	uint64_t note_start_ticks;
 	int playing;
 } MusicState;
 
 static MusicState g_music = {0};
 
 static inline uint64_t ms_to_ticks(uint64_t ms){
-	// Kernel sleep usa target = ms/10, así que 1 tick ≈ 10ms (aprox. según PIT)
 	return (ms + 9) / 10; // redondeo hacia arriba
 }
 
@@ -116,4 +111,3 @@ void tron_music_update(void){
 		music_apply_note(&g_music.seq[g_music.idx]);
 	}
 }
-

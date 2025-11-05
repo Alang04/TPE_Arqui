@@ -1,4 +1,3 @@
-/* Video-mode renderer for Tron (framebuffer rectangles) */
 #include <stdint.h>
 #include "../include/render_video.h"
 #include "../include/config.h"
@@ -7,8 +6,8 @@
 
 static int g_grid_w = 0, g_grid_h = 0;
 static uint64_t g_scr_w = 0, g_scr_h = 0;
-static uint64_t g_cell = 0;          // tamaño de celda en píxeles (lado)
-static uint64_t g_off_x = 0, g_off_y = 0; // offset para centrar tablero
+static uint64_t g_cell = 0;                  // tamaño de celda en píxeles (lado)
+static uint64_t g_off_x = 0, g_off_y = 0;    // offset para centrar tablero
 static int g_cache_valid = 0;
 static int g_last_step = -1;
 static uint8_t g_drawn_cells[TRON_GRID_H][TRON_GRID_W];
@@ -54,7 +53,7 @@ void render_video_init(int grid_w, int grid_h){
 }
 
 void render_video_begin(void){
-	// No-op (full redraw each frame)
+
 }
 
 static inline void draw_cell(int gx, int gy, uint32_t color){
@@ -63,8 +62,6 @@ static inline void draw_cell(int gx, int gy, uint32_t color){
 	uint64_t y = g_off_y + (uint64_t)gy * g_cell;
 	sys_fill_rect(x, y, g_cell, g_cell, color);
 }
-
-// -------------------------- HUD: fuente 5x7 --------------------------
 
 // Cada entrada es 7 filas, 5 bits usados de MSB a LSB (bit 4..0)
 typedef struct { char ch; uint8_t rows[7]; } Glyph5x7;
@@ -103,7 +100,7 @@ static const Glyph5x7 FONT5x7[] = {
 	// Símbolos mínimos
 	{':',{0x00,0x04,0x00,0x00,0x00,0x04,0x00}},
 	{' ',{0x00,0x00,0x00,0x00,0x00,0x00,0x00}},
-	{'1',{0x04,0x0C,0x14,0x04,0x04,0x04,0x1F}}, // redundante por seguridad
+	{'1',{0x04,0x0C,0x14,0x04,0x04,0x04,0x1F}},
 	{'2',{0x1E,0x01,0x01,0x1E,0x10,0x10,0x1F}},
 };
 
@@ -245,7 +242,7 @@ void render_video_draw(const GameSnapshot *snap){
 }
 
 void render_video_end(void){
-	// No-op
+
 }
 
 void render_video_clear(void){
@@ -257,5 +254,6 @@ void render_video_clear(void){
 	if(g_scr_w && g_scr_h){
 		sys_fill_rect(0, 0, g_scr_w, g_scr_h, TRON_COLOR_BG);
 	}
+	// Invalida cache para forzar redibujo completo en el próximo frame
+	g_cache_valid = 0;
 }
-

@@ -1,4 +1,3 @@
-/* Text-mode renderer for Tron */
 #include <stdint.h>
 #include "../include/render_text.h"
 #include "../../c/include/userlib.h"
@@ -11,7 +10,7 @@ void render_text_init(int grid_w, int grid_h){
 }
 
 void render_text_begin(void){
-    // no-op for text renderer
+
 }
 
 static void put_str(const char *s){
@@ -62,7 +61,6 @@ void render_text_draw(const GameSnapshot *snap){
             else if(c == CELL_TRAIL_P2) ch = '2';
             else if(c == CELL_WALL) ch = '#';
 
-            // Overlay heads
             if(snap->p1.alive && x == snap->p1.x && y == snap->p1.y) ch = 'A';
             if(snap->p2.alive && x == snap->p2.x && y == snap->p2.y) ch = 'B';
 
@@ -74,7 +72,7 @@ void render_text_draw(const GameSnapshot *snap){
 }
 
 void render_text_end(void){
-    // no-op
+
 }
 
 void render_text_clear(void){

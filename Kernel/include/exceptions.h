@@ -6,8 +6,8 @@
 
 void exceptionDispatcher(int exception);
 void exceptionHandler(char * msg);
-void zeroDivision();
-void invalidOpcode();
-typedef void (*Exception)();
+void zeroDivision(void);
+void invalidOpcode(void);
+typedef void (*Exception)(void);
 
 #endif

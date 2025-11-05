@@ -11,7 +11,6 @@
 // Nota: en este SO, 18 ticks ≈ 1s (aprox). 3 → ~6 steps/seg
 #define TRON_DEFAULT_TICKS_PER_STEP 3
 
-// Colores sugeridos para modo gráfico (RGB 0xRRGGBB)
 #define TRON_COLOR_BG   0x000000
 #define TRON_COLOR_P1   0x00FFFF
 #define TRON_COLOR_P2   0xFF00FF

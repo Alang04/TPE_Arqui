@@ -16,7 +16,6 @@ void ncPrint(const char * string){
 	}
 }
 
-
 // Imprime un caracter con manejo de \n y \b
 void ncPrintChar(char character){
 	switch (character){
@@ -24,11 +23,9 @@ void ncPrintChar(char character){
 		currentVideo -= 2;
 		*currentVideo = 0;
 		break;
-
 	case '\n':
 		ncNewline();
 		break;
-
 	default:
 		*currentVideo = character;
 		currentVideo += 2;
@@ -60,8 +57,8 @@ void ncPrintBase(uint64_t value, uint32_t base){
     ncPrint(buffer);
 }
 
-void ncClear(){
-	int i;
+void ncClear(void){
+	uint32_t i;
 	for(i = 0; i < height * width; i++){
 		video[i * 2] = ' ';
 	}
@@ -69,7 +66,7 @@ void ncClear(){
 }
 
 // Avanza a la siguiente línea respetando el ancho
-void ncNewline(){
+void ncNewline(void){
 	do{
 		ncPrintChar(' ');
 	}

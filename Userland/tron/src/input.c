@@ -4,7 +4,6 @@
 #include "../include/config.h"
 
 void input_init(void){
-    // TODO: inicializar buffers/estado si hiciera falta
     char c;
     while(sys_read(&c, 1) > 0){
         // vaciar buffer de teclado previo
@@ -13,15 +12,12 @@ void input_init(void){
 }
 
 void input_poll(InputEvents *out){
-    // TODO: leer sys_read no bloqueante y mapear a eventos discretos
-
     //Inicializo los eventos de salida en 0
     out -> has_p1_turn = 0;
     out -> has_p2_turn = 0;
     out -> pause_toggled = 0;
     out -> quit_requested = 0;
     
-
     int count = 0;
     int byte_readed = 1;
     while(count < MAX_KEYS_PER_TICKS && byte_readed && out -> quit_requested == 0){ 
@@ -55,8 +51,6 @@ void input_poll(InputEvents *out){
 }
 
 int input_map_key_to_dir_for_p1(char c, Direction *out){
-    // TODO: usar config.h (WASD) y completar out
-
     int toReturn = 0;
     if(c == KEY_P1_UP){
         *out = DIR_UP;
@@ -76,8 +70,6 @@ int input_map_key_to_dir_for_p1(char c, Direction *out){
 }
 
 int input_map_key_to_dir_for_p2(char c, Direction *out){
-    // TODO: usar config.h (IJKL) y completar out
-
     int toReturn = 0;
     if(c == KEY_P2_UP){
         *out = DIR_UP;

@@ -3,7 +3,6 @@ include Makefile.inc
 MODULE=0000-sampleCodeModule.bin
 SAMPLE_DATA=0001-sampleDataModule.bin
 
-# Project layout uses c/, asm/, include/
 SOURCES=$(wildcard _loader.c c/*.c tron/src/*.c)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)

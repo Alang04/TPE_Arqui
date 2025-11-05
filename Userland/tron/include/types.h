@@ -80,4 +80,4 @@ typedef struct {
     Winner winner;      // válido si state == STATE_GAME_OVER
 } GameSnapshot;
 
-#endif // TRON_TYPES_H
+#endif

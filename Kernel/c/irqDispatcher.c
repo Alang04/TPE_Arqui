@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include "time.h"
 #include "keyboardDriver.h"
+#include "irqDispatcher.h"
 
-static void int_20();
+static void int_20(void);
 
 // Enruta IRQs del PIC a sus manejadores de C
 void irqDispatcher(uint64_t irq){
@@ -18,6 +19,6 @@ void irqDispatcher(uint64_t irq){
 }
 
 // IRQ0: tick del PIT
-void int_20(){
+void int_20(void){
 	timer_handler();
 }

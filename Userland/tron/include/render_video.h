@@ -10,4 +10,4 @@ void render_video_draw(const GameSnapshot *snap);
 void render_video_end(void);
 void render_video_clear(void);
 
-#endif // TRON_RENDER_VIDEO_H
+#endif

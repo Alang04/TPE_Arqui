@@ -21,16 +21,16 @@ void sys_clear(){
 
 // Escribe 'count' bytes en la salida indicada (texto gráfico)
 uint64_t sys_write(uint64_t fd, const char * buff, uint64_t count){
+    (void)fd;
     uint32_t color = 0xFFFFFF;
 
-    for(int i = 0; i < count; i++){
-        videoPutChar(buff[i], color);
+    for(uint64_t i = 0; i < count; i++){
+        videoPutChar((uint8_t)buff[i], color);
     }
 
     return count;
 }
 
-// Lee hasta 'count' bytes del buffer de teclado (no bloqueante)
 uint64_t sys_read(char * buff, uint64_t count){
    return readKeyBuff(buff, count);
 }
@@ -56,7 +56,6 @@ uint64_t sys_ticks(){
     return deltaTicks();
 }
 
-// Audio no bloqueante: controlar el parlante directamente
 void sys_speaker_start(uint32_t freq){
     startSpeaker(freq);
 }
@@ -64,8 +63,6 @@ void sys_speaker_start(uint32_t freq){
 void sys_speaker_off(){
     turnOff();
 }
-
-// -------------------- Nuevas syscalls gráficas --------------------
 
 uint64_t sys_screen_width(){
     return (uint64_t)getScreenWidth();
