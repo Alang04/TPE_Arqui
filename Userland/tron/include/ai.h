@@ -1,3 +1,4 @@
+// API de solo consumo (Tron AI): sugiere giros válidos sin mutar estado
 #ifndef TRON_AI_H
 #define TRON_AI_H
 

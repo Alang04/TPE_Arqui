@@ -1,4 +1,6 @@
 
+TARGET ?= qemu
+
 all:  bootloader kernel userland image
 
 bootloader:
@@ -11,7 +13,17 @@ userland:
 	cd Userland; make all
 
 image: kernel bootloader userland
-	cd Image; make all
+	$(MAKE) -C Image TARGET=$(TARGET) all
+
+# Convenience targets for explicit images
+image-qemu: TARGET=qemu
+image-qemu: image
+
+image-vbox: TARGET=vbox
+image-vbox: image
+
+image-usb: TARGET=usb
+image-usb: image
 
 clean:
 	cd Bootloader; make clean

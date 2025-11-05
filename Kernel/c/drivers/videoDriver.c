@@ -50,8 +50,9 @@ static uint64_t defaultTextSize = TEXT_SIZE; // Tamaño por defecto (ajustable)
 // Internal helpers (forward declarations)
 static void updateCursor(void);
 static void moveRight(void);
-static int abs(int x);
 static void drawChar(uint32_t x, uint32_t y, uint8_t c, uint32_t color, uint64_t size);
+static void v_fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color);
+static void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color);
 
 // API utilitaria
 // Ancho en píxeles del modo actual
@@ -125,7 +126,7 @@ void scroll(){
 
     uint64_t lastLineStart = vbe_mode_info->height - lineHeight;
 
-    fillRectangle(0, lastLineStart, vbe_mode_info->width, vbe_mode_info->height, bgColor);
+    v_fillRectangle(0, lastLineStart, vbe_mode_info->width, vbe_mode_info->height, bgColor);
 }
 
 // Salta a la línea siguiente con scroll automático
@@ -137,7 +138,7 @@ void newLine(){
     if(currentY + stepY < vbe_mode_info->height){
 
         currentY += stepY;
-        fillRectangle(0, currentY, vbe_mode_info->width, currentY + stepY, bgColor);
+    v_fillRectangle(0, currentY, vbe_mode_info->width, currentY + stepY, bgColor);
 
     } else{
 
@@ -159,7 +160,7 @@ void videoPutChar(uint8_t c, uint32_t color){
     uint64_t stepY = (uint64_t)FONT_HEIGHT * defaultTextSize;
         if(currentX >= stepX){
             currentX -= stepX;
-            fillRectangle(currentX, currentY, currentX + stepX, currentY + stepY, bgColor);
+            v_fillRectangle(currentX, currentY, currentX + stepX, currentY + stepY, bgColor);
             updateCursor();
         }
         return;
@@ -211,40 +212,10 @@ void setTextSize(uint8_t size){
 
 /* FUNCIONES DE MODO GRAFICO */
 
-static int abs(int x){ 
-    return (x < 0) ? (-x) : (x);
-}
-
-// Línea con algoritmo de Bresenham
-void drawLine(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color){
-    int64_t ix0 = (int64_t)x0, iy0 = (int64_t)y0, ix1 = (int64_t)x1, iy1 = (int64_t)y1;
-    int64_t dx = abs((int)(ix1 - ix0));
-    int64_t sx = (ix0 < ix1) ? (1) : (-1);
-    int64_t dy = -abs((int)(iy1 - iy0));
-    int64_t sy = (iy0 < iy1) ? (1) : (-1);
-    int64_t err = dx + dy;
-
-    while(1){
-        putPixel(color, (uint64_t)ix0, (uint64_t)iy0);
-
-        if((iy0 == iy1) && (ix0 == ix1)){
-            break;
-        }
-
-        int64_t e2 = 2 * err;
-
-        if(e2 >= dy){
-            err += dy; ix0 += sx; 
-        }
-
-        if(e2 <= dx){
-            err += dx; iy0 += sy;
-        }
-    }
-}
+// (drawLine removed: not used by current kernel/userland)
 
 // Rellena un rectángulo [x0,y0) x [x1,y1)
-void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
+static void v_fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
     if (x1 <= x0 || y1 <= y0){
         return;
     }
@@ -275,26 +246,10 @@ void fillRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t 
 }
 
 // Dibuja el contorno de un rectángulo
-void drawRectangle(uint64_t x0, uint64_t y0, uint64_t x1, uint64_t y1, uint32_t color) {
-    // Normaliza coordenadas
-    if(x1 < x0){ 
-        uint64_t t = x0; x0 = x1; x1 = t;
-    }
-
-    if(y1 < y0){
-        uint64_t t = y0; y0 = y1; y1 = t;
-    }
-
-    // Lados
-    drawLine(x0, y0, x1, y0, color);
-    drawLine(x1, y0, x1, y1, color);
-    drawLine(x1, y1, x0, y1, color);
-    drawLine(x0, y1, x0, y0, color);
-}
 
 // Rellena un rectángulo usando ancho/alto
-void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color){
-    fillRectangle(x, y, (uint64_t)x + width, (uint64_t)y + height, color);
+static void drawFilledRect(uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t color){
+    v_fillRectangle(x, y, (uint64_t)x + width, (uint64_t)y + height, color);
 }
 
 // Dibuja una cadena en (x,y) tamaño escalado
@@ -332,4 +287,12 @@ void clearScreen(uint32_t color){
     drawFilledRect(0, 0, vbe_mode_info->width, vbe_mode_info->height, color);
     currentX = 0;
     currentY = 0;
+}
+
+// API pública: rellena un rectángulo en (x,y) tamaño (w,h)
+void fillRect(uint64_t x, uint64_t y, uint64_t w, uint64_t h, uint32_t color){
+    if(w == 0 || h == 0){
+        return;
+    }
+    v_fillRectangle(x, y, x + w, y + h, color);
 }

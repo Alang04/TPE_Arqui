@@ -211,26 +211,6 @@ void bmMEM(){
         shellPrintString(buff);
         shellPrintString("\n");
     }
-
-    /* flush redraw buffer to their file descriptors (same behavior as before) */
-    uint64_t current = redrawBuffer[0].fd;
-    uint32_t idx = 0;
-
-    for(uint32_t i = 0; i < redrawLength; i++){
-        if(redrawBuffer[i].fd != current || idx >= sizeof(buffer) - 1){
-
-            if(idx > 0){
-                sys_write(current, buffer, idx);
-                idx = 0;
-            }
-            current = redrawBuffer[i].fd;
-        }
-        buffer[idx++] = redrawBuffer[i].character;
-    }
-
-    if(idx > 0){
-        sys_write(current, buffer, idx);
-    }
 }
 
 // Mide tiempo hasta presionar una tecla
@@ -465,16 +445,16 @@ void printDate(){
 }
 
 // Implementaciones mínimas de string para entorno freestanding
-// strlen mínimo para entorno freestanding
-size_t strlen(const char *s){
+// strlen mínimo para entorno freestanding (interno a este módulo)
+static size_t strlen(const char *s){
     size_t n = 0;
     if(s == 0) return 0;
     while(s[n] != '\0') n++;
     return n;
 }
 
-// strcmp mínimo para entorno freestanding
-int strcmp(const char *a, const char *b){
+// strcmp mínimo para entorno freestanding (interno a este módulo)
+static int strcmp(const char *a, const char *b){
     if(a == 0 && b == 0){
           return 0;
     }

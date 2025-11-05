@@ -3,7 +3,7 @@
 #include "../include/tron_main.h"
 #include "../include/game.h"
 #include "../include/input.h"
-#include "../include/render_text.h"
+#include "../include/render.h"
 #include "../include/ai.h"
 #include "../include/menu.h"
 #include "../include/tron_sound.h"
@@ -39,7 +39,7 @@ int tron_main(void){
         game_enable_ai(g, (cfg.mode == MODE_ONE_PLAYER) ? 1 : 0); // P2 como IA en 1P
 
         input_init();
-        render_text_init(TRON_GRID_W, TRON_GRID_H);
+    render_init(TRON_GRID_W, TRON_GRID_H);
 
         int running = 1;
         int paused = 0;
@@ -101,15 +101,15 @@ int tron_main(void){
             tron_music_update();
 
             // Render
-            render_text_clear();
+            render_clear();
             GameSnapshot snap2; 
             game_get_snapshot(g, &snap2);
             if(paused && snap2.state == STATE_PLAYING){
                 snap2.state = STATE_PAUSED; // reflect pause in HUD
             }
-            render_text_begin();
-            render_text_draw(&snap2);
-            render_text_end();
+            render_begin();
+            render_draw(&snap2);
+            render_end();
         }
 
         game_destroy(g);

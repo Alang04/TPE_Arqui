@@ -11,6 +11,10 @@ GLOBAL sys_ticks
 GLOBAL sys_beep
 GLOBAL sys_speaker_start
 GLOBAL sys_speaker_off
+GLOBAL sys_screen_width
+GLOBAL sys_screen_height
+GLOBAL sys_putpixel
+GLOBAL sys_fill_rect
 GLOBAL gen_invalid_opcode
 
 section .text
@@ -74,6 +78,28 @@ sys_speaker_start:
 ; No bloqueante: apaga el parlante
 sys_speaker_off:
 	mov rax, 11
+	int 0x80
+	ret
+
+; Dimensiones de pantalla
+sys_screen_width:
+	mov rax, 12
+	int 0x80
+	ret
+
+sys_screen_height:
+	mov rax, 13
+	int 0x80
+	ret
+
+; Dibujo básico
+sys_putpixel:
+	mov rax, 14
+	int 0x80
+	ret
+
+sys_fill_rect:
+	mov rax, 15
 	int 0x80
 	ret
 

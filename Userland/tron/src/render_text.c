@@ -3,9 +3,6 @@
 #include "../include/render_text.h"
 #include "../../c/include/userlib.h"
 
-// Forward declaration from userlib.c
-uint64_t num_to_str(uint64_t value, char * dest, int base);
-
 static int g_w = 0, g_h = 0;
 
 void render_text_init(int grid_w, int grid_h){

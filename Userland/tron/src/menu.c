@@ -6,9 +6,6 @@
 #include "../include/tron_sound.h"
 #include "../../c/include/userlib.h"
 
-// Helpers from userlib
-uint64_t num_to_str(uint64_t value, char * dest, int base);
-
 static void put_ch(char c){ sys_write(STDOUT, &c, 1); }
 static void put_str(const char *s){ if(!s) return; for(const char *p=s; *p; ++p) put_ch(*p); }
 
@@ -18,7 +15,7 @@ static void put_num(uint64_t v){
     for(char *p=b; *p; ++p) put_ch(*p);
 }
 
-static void clear_screen(){ sys_clear(); }
+static void clear_screen(void){ sys_clear(); }
 
 static int read_key_nonblock(char *out){
     int r = sys_read(out, 1);
@@ -29,7 +26,7 @@ static int read_key_nonblock(char *out){
     return 1;
 }
 
-static void wait_small_delay(){
+static void wait_small_delay(void){
     // Pequeño spin para no saturar el CPU; usamos ticks
     uint64_t start = sys_ticks();
     while((int)(sys_ticks() - start) < 1) { /* ~1 tick */ tron_music_update(); }
@@ -41,11 +38,11 @@ static int clamp(int v, int lo, int hi){
     return v;
 }
 
-static void draw_header(){
+static void draw_header(void){
     put_str("==================== TRON ====================\n");
 }
 
-static int show_main_menu(){
+static int show_main_menu(void){
     clear_screen();
     draw_header();
     put_str("Seleccione un modo:\n\n");

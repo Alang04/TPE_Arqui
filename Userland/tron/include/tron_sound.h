@@ -1,3 +1,4 @@
+// API de solo consumo (Tron sonido): jingles cortos y música de fondo no bloqueante
 #ifndef TRON_SOUND_H
 #define TRON_SOUND_H
 

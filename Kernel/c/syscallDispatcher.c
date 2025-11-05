@@ -65,6 +65,24 @@ void sys_speaker_off(){
     turnOff();
 }
 
+// -------------------- Nuevas syscalls gráficas --------------------
+
+uint64_t sys_screen_width(){
+    return (uint64_t)getScreenWidth();
+}
+
+uint64_t sys_screen_height(){
+    return (uint64_t)getScreenHeight();
+}
+
+void sys_putpixel(uint32_t color, uint64_t x, uint64_t y){
+    putPixel(color, x, y);
+}
+
+void sys_fill_rect(uint64_t x, uint64_t y, uint64_t w, uint64_t h, uint32_t color){
+    fillRect(x, y, w, h, color);
+}
+
 void * syscalls[CANT_SYS] = {
     &sys_registers,         // 0
     &sys_time,              // 1
@@ -77,5 +95,9 @@ void * syscalls[CANT_SYS] = {
     &sys_ticks,             // 8
     &sys_clear,             // 9
     &sys_speaker_start,     // 10
-    &sys_speaker_off        // 11
+    &sys_speaker_off,       // 11
+    &sys_screen_width,      // 12
+    &sys_screen_height,     // 13
+    &sys_putpixel,          // 14
+    &sys_fill_rect          // 15
 };

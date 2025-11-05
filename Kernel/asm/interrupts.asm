@@ -262,10 +262,11 @@ _exception6Handler:
 	exceptionHandler 6
 
 _irq128Handler:
-    pushState
-	cmp rax, 10 ; validar índice de syscall (CANT_SYS)
-    jge .syscall_end
-    call [syscalls + rax * 8]
+	pushState
+	; validar índice de syscall (usar el mismo valor que CANT_SYS en defs.h)
+	cmp rax, 16
+	jge .syscall_end
+	call [syscalls + rax * 8]
 
 .syscall_end:
     mov [aux], rax

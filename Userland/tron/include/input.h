@@ -1,3 +1,4 @@
+// API de solo consumo (Tron input): lectura no bloqueante y mapeo de teclas
 #ifndef TRON_INPUT_H
 #define TRON_INPUT_H
 

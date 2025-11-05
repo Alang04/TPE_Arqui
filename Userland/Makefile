@@ -21,7 +21,7 @@ $(MODULE): $(OBJECTS) $(OBJECTS_ASM)
 	$(ASM) $(ASMFLAGS) $< -o $@
 
 clean:
-	rm -rf asm/*.o c/*.o *.o $(MODULE) $(SAMPLE_DATA)
+	rm -rf asm/*.o c/*.o tron/src/*.o *.o $(MODULE) $(SAMPLE_DATA)
 
 sampleDataModule:
 	printf "This is sample data." >> $(SAMPLE_DATA) && dd if=/dev/zero bs=1 count=1 >> $(SAMPLE_DATA)

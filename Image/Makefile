@@ -1,3 +1,4 @@
+TARGET ?= qemu
 BOOTLOADER_PATH=../Bootloader
 BMFS=$(BOOTLOADER_PATH)/BMFS/bmfs.bin
 MBR=$(BOOTLOADER_PATH)/Pure64/bmfs_mbr.sys
@@ -13,7 +14,16 @@ USERLAND=../Userland/0000-sampleCodeModule.bin ../Userland/0001-sampleDataModule
 PACKEDKERNEL=packedKernel.bin
 IMGSIZE=6291456
 
-all: $(IMG) $(VMDK) $(QCOW2)
+# Build outputs depend on TARGET
+ifeq ($(TARGET),qemu)
+all: $(QCOW2)
+else ifeq ($(TARGET),vbox)
+all: $(VMDK)
+else ifeq ($(TARGET),usb)
+all: $(IMG)
+else
+$(error Unknown TARGET '$(TARGET)'; use qemu|vbox|usb)
+endif
 
 $(KERNEL):
 	cd ../Kernel; make
@@ -25,7 +35,7 @@ $(IMG): $(BMFS) $(MBR) $(PURE64) $(PACKEDKERNEL)
 	$(BMFS) $(IMG) initialize $(IMGSIZE) $(MBR) $(PURE64) $(PACKEDKERNEL) 
 
 $(VMDK): $(IMG)
-	qemu-img convert -f raw -O vmdk $(IMG) $(VMDK) 
+	qemu-img convert -f raw -O vmdk $(IMG) $(VMDK)
 
 $(QCOW2): $(IMG)
 	qemu-img convert -f raw -O qcow2 $(IMG) $(QCOW2)

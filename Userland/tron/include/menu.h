@@ -1,3 +1,4 @@
+// API de solo consumo (Tron menú): I/O por texto, no bloqueante, configura partida
 #ifndef TRON_MENU_H
 #define TRON_MENU_H
 

@@ -40,7 +40,7 @@ void load_idt(){
   idtr.base = (uint64_t)idt;
   __asm__ __volatile__("lidt %0" : : "m"(idtr));
 
-  // Mask PIC: enable only timer
+  // Mask PIC
   picMasterMask(0xFC);
   picSlaveMask(0xFF);
 

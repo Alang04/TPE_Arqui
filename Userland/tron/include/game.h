@@ -1,3 +1,5 @@
+// API de solo consumo (Tron): lógica de juego y snapshot para render/IA
+// Contrato: funciones no bloqueantes; snapshot es copia de lectura del estado.
 #ifndef TRON_GAME_H
 #define TRON_GAME_H
 

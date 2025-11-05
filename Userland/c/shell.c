@@ -3,7 +3,7 @@
 
 // Visual cursor helpers (only used during input)
 static int cursorVisible = 0;
-static void showCursor(){
+static void showCursor(void){
     if(!cursorVisible){
         char cursor = CURSOR;
         sys_write(STDOUT, &cursor, 1);
@@ -11,7 +11,7 @@ static void showCursor(){
     }
 }
 
-static void hideCursor(){
+static void hideCursor(void){
     if(cursorVisible){
         char backspace = '\b';
         sys_write(STDOUT, &backspace, 1);
@@ -20,7 +20,7 @@ static void hideCursor(){
 }
 
 // Bucle principal de la shell de usuario
-int main(){
+int main(void){
     shellPrintString(WELCOME);
     shellNewline();
     shellPrintString("Escriba 'help' para listar comandos.\n");
@@ -115,7 +115,6 @@ void shellPrintString(char *str){
 // Escribe un caracter en el descriptor indicado
 void shellPutchar(char c, uint64_t fd){
     // Registrar en redraw buffer antes de imprimir
-    extern void redraw_append_char(char, uint64_t);
     redraw_append_char(c, fd);
     sys_write(fd, &c, 1); // escribo el caracter
 }

@@ -1,3 +1,9 @@
+// API de solo consumo (userland): wrappers de syscalls y utilitarios mínimos
+// Contrato:
+// - Todas las funciones sys_* invocan al kernel vía int 0x80.
+// - sys_read es no bloqueante (devuelve 0 si no hay input). getchar() bloquea hasta leer 1 byte.
+// - sys_ticks devuelve ticks desde arranque; tiempo/fecha en BCD.
+// - Redraw buffer registra salida para re-render al cambiar tamaño de fuente.
 #ifndef USERLIB_H
 #define USERLIB_H
 
@@ -54,6 +60,11 @@ void sys_clear(void);
 // Audio no bloqueante para música de fondo
 void sys_speaker_start(uint32_t freq);
 void sys_speaker_off(void);
+// Gráficas (framebuffer)
+uint64_t sys_screen_width(void);
+uint64_t sys_screen_height(void);
+void sys_putpixel(uint32_t color, uint64_t x, uint64_t y);
+void sys_fill_rect(uint64_t x, uint64_t y, uint64_t w, uint64_t h, uint32_t color);
 uint64_t putchar(char c);
 char getchar(void);
 void processLine(char * buff, uint32_t * history_len);

@@ -16,17 +16,6 @@ void ncPrint(const char * string){
 	}
 }
 
-void ncPrintStyle(const char * msg, const char style){
-	for(int i = 0; msg[i] != 0 && currentVideo < limit; i++){
-		currentVideo[0] = msg[i];
-		currentVideo[1] = style;
-		currentVideo += 2;
-	}
-
-	if(currentVideo >= limit){
-		currentVideo = video;
-	}
-}
 
 // Imprime un caracter con manejo de \n y \b
 void ncPrintChar(char character){
